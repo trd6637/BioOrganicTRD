@@ -121,7 +121,6 @@
         #adminLoginBtn { position: fixed; bottom: 15px; left: 15px; width: 45px; height: 45px; background-color: #6c757d; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.2); transition: all 0.3s ease; z-index: 1050; opacity: 0.7; }
         #adminLoginBtn:hover { transform: scale(1.1); opacity: 1; }
         
-        /* FIXED: Rocket Animation Styles */
         .rocket-container { position: relative; width: 150px; height: 300px; margin: 0 auto; animation: launch 2s ease-in-out forwards; }
         @keyframes launch { 0% { transform: translateY(100px); opacity: 0; } 20% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-400px); opacity: 0; } }
         .rocket-body { font-size: 6rem; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); z-index: 2; }
@@ -229,7 +228,8 @@
     <!-- Page 2: Registration Form -->
     <div id="registerPage" class="page">
         <div class="card-container">
-            <h2 class="mb-4" style="color: #0d6efd;">ระบบลงทะเบียน</h2>
+            <!-- FIXED: Larger and bolder title -->
+            <h2 class="display-5 fw-bold mb-5" style="color: #0d6efd;">ระบบลงทะเบียน</h2>
             <form id="registrationForm" novalidate>
                  <div class="row g-3">
                      <div class="col-12">
@@ -259,7 +259,8 @@
                      <div class="col-12">
                          <label for="testUsernameInput" class="form-label">ชื่อผู้ใช้งานระบบแบบทดสอบ</label>
                          <input type="text" class="form-control" id="testUsernameInput" placeholder="ขั้นต่ำ 4 ตัวอักษร" required minlength="4">
-                         <div class="form-text text-muted">(สามารถใช้อักษรภาษาอังกฤษ, ตัวเลข, อักขระพิเศษ ได้เท่านั้น)</div>
+                         <!-- FIXED: Updated helper text -->
+                         <div class="form-text text-muted">(ต้องมีตัวอักษรภาษาอังกฤษอย่างน้อย 1 ตัว และสามารถใช้ตัวเลข/อักขระพิเศษได้)</div>
                      </div>
                      <div class="col-12 text-start"><label class="form-label">🍽️ ข้อมูลการแพ้อาหาร/อิสลาม</label><div class="form-check"><input class="form-check-input" type="radio" name="foodInfo" id="foodMuslim" value="อิสลาม/มุสลิม" required><label class="form-check-label" for="foodMuslim">อิสลาม/มุสลิม</label></div><div class="form-check"><input class="form-check-input" type="radio" name="foodInfo" id="foodNone" value="ไม่แพ้อาหาร" required><label class="form-check-label" for="foodNone">ไม่แพ้อาหาร</label></div><div class="form-check"><input class="form-check-input" type="radio" name="foodInfo" id="foodAllergy" value="แพ้อาหาร" required><label class="form-check-label" for="foodAllergy">แพ้อาหาร</label></div><input type="text" class="form-control mt-2" id="allergyDetails" placeholder="โปรดระบุอาหารที่แพ้" style="display: none;"></div>
                  </div>
@@ -438,7 +439,7 @@
         <!-- Test Login Modal -->
         <div class="modal fade" id="testLoginModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">เข้าสู่ระบบแบบทดสอบ</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><form id="testLoginForm"><div class="mb-3"><label class="form-label">Username</label><input type="text" class="form-control" id="testUsername" placeholder="username ที่กำหนดจากการลงทะเบียน" required></div><div class="mb-3"><label class="form-label">Password</label><input type="password" class="form-control" id="testPassword" placeholder="หมายเลขโทรศัพท์ 4 ตัวท้าย" required></div><button type="submit" class="btn btn-primary w-100">Login</button></form><div class="text-center mt-3"><a href="#" id="forgotPasswordLink">หากลืมชื่อผู้ใช้ หรือรหัสผ่าน กดที่นี่!</a></div></div></div></div></div>
         <!-- Test Wait Modal -->
-        <div class="modal fade" id="testWaitModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content" style="border-radius: 16px; background-color: #fff0f5;"><div class="modal-body text-center p-4"><img src="https://i.postimg.cc/BnG8Xg18/IMG-3180.png" class="mb-3 rounded-circle" style="width:100px; height:100px; object-fit:cover;" alt="Cartoon Character"><h5 class="modal-title">ใจเย็น ๆ น้า</h5><p>ระบบยังไม่เปิดให้บริการ หรือ ข้อมูลผู้ใช้ไม่ถูกต้อง</p><div class="d-flex justify-content-center gap-2 mt-3"><button type="button" class="btn btn-danger btn-sm" data-bs-dismiss="modal">ปิด</button><button id="waitModalBackToHomeBtn" class="btn btn-link text-secondary btn-sm">กลับหน้าแรก</button></div></div></div></div></div>
+        <div class="modal fade" id="testWaitModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content" style="border-radius: 16px; background-color: #fff0f5;"><div class="modal-body text-center p-4"><img src="https://i.postimg.cc/BnG8Xg18/IMG-3180.png" class="mb-3 rounded-circle" style="width:100px; height:100px; object-fit:cover;" alt="Cartoon Character"><h5 class="modal-title">เกิดข้อผิดพลาด</h5><p>ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง กรุณาตรวจสอบอีกครั้ง</p><div class="d-flex justify-content-center gap-2 mt-3"><button type="button" class="btn btn-danger btn-sm" data-bs-dismiss="modal">ปิด</button><button id="waitModalBackToHomeBtn" class="btn btn-link text-secondary btn-sm">กลับหน้าแรก</button></div></div></div></div></div>
         <!-- Forgot Password Modal -->
         <div class="modal fade" id="forgotPasswordModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">ค้นหาข้อมูลผู้ใช้งาน</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><form id="forgotPasswordForm"><div class="mb-3"><label class="form-label">ชื่อ</label><input type="text" class="form-control" id="recoveryFirstName" placeholder="ชื่อจริง (ไม่ต้องมีคำนำหน้า)" required></div><div class="mb-3"><label class="form-label">นามสกุล</label><input type="text" class="form-control" id="recoveryLastName" placeholder="นามสกุล" required></div><div class="mb-3"><label class="form-label">หมายเลขโทรศัพท์</label><input type="tel" class="form-control" id="recoveryPhone" placeholder="0812345678" required></div><button type="submit" class="btn btn-info w-100">ค้นหา</button></form><div id="recoveryResult" class="mt-3"></div></div><div class="modal-footer"><button type="button" class="btn btn-secondary" id="backToLoginBtn">กลับไปยังหน้าเข้าสู่ระบบ</button></div></div></div></div>
         <!-- Feature Closed Modal -->
@@ -651,9 +652,13 @@
 
             function handleTestLoginSubmit(e) {
                 e.preventDefault();
-                const username = document.getElementById('testUsername').value;
-                const password = document.getElementById('testPassword').value;
-                const user = registeredUsers.find(u => u.Username === username && u.Password.toString() === password);
+                const username = document.getElementById('testUsername').value.trim();
+                const password = document.getElementById('testPassword').value.trim();
+                // FIXED: Robust login check (case-insensitive username and string comparison)
+                const user = registeredUsers.find(u => 
+                    u.Username.trim().toLowerCase() === username.toLowerCase() && 
+                    String(u.Password).trim() === password
+                );
 
                 if (user) {
                     currentUser = user; // <-- IMPORTANT: Store the logged-in user
@@ -716,13 +721,24 @@
 
             function validateForm() {
                 const errors = [];
+                const testUsername = document.getElementById('testUsernameInput').value.trim();
+                
                 if ((document.getElementById('prefix').value === 'อื่น ๆ' && !document.getElementById('otherPrefix').value.trim()) || !document.getElementById('prefix').value) errors.push('กรุณาระบุ/เลือกคำนำหน้าชื่อ');
                 if (!document.getElementById('firstName').value.trim()) errors.push('กรุณากรอกชื่อ');
                 if (!document.getElementById('lastName').value.trim()) errors.push('กรุณากรอกนามสกุล');
                 if (!choicesInstance.getValue(true)) errors.push('กรุณาเลือกหน่วยงาน/สังกัด');
                 if (!document.getElementById('personnelType').value) errors.push('กรุณาเลือกประเภทบุคลากร');
                 if (!/^\d{10}$/.test(document.getElementById('phone').value)) errors.push('กรุณากรอกหมายเลขโทรศัพท์ 10 หลัก');
-                if (document.getElementById('testUsernameInput').value.trim().length < 4) errors.push('กรุณากรอกชื่อผู้ใช้งานอย่างน้อย 4 ตัวอักษร');
+                
+                // Username validation block
+                if (testUsername.length < 4) {
+                    errors.push('กรุณากรอกชื่อผู้ใช้งานอย่างน้อย 4 ตัวอักษร');
+                }
+                // FIXED: Check if username contains at least one letter
+                if (!/[a-zA-Z]/.test(testUsername)) {
+                    errors.push('ชื่อผู้ใช้งานต้องมีตัวอักษรภาษาอังกฤษอย่างน้อย 1 ตัว');
+                }
+
                 const foodInfo = document.querySelector('input[name="foodInfo"]:checked');
                 if (!foodInfo) errors.push('กรุณาเลือกข้อมูลการแพ้อาหาร');
                 else if (foodInfo.value === 'แพ้อาหาร' && !document.getElementById('allergyDetails').value.trim()) errors.push('กรุณาระบุอาหารที่แพ้');
@@ -745,15 +761,16 @@
                 showModal('confirmationModal');
             }
 
-            function handleFinalSubmit() {
+            async function handleFinalSubmit() {
                 hideModal('confirmationModal');
                 const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
                 const modalBody = document.getElementById('loadingModalBody');
                 modalBody.innerHTML = `<div class="text-white text-center"><div class="rocket-container"><div class="rocket-body">🚀</div><div class="rocket-trail"></div></div><p class="mt-3 fs-5">กำลังส่งข้อมูล...</p></div>`;
                 loadingModal.show();
                 const formData = new FormData();
+                const timestamp = new Date().toISOString();
                 formData.append('action', 'register');
-                formData.append('Timestamp', new Date().toISOString());
+                formData.append('Timestamp', timestamp);
                 formData.append('Prefix', document.getElementById('prefix').value === 'อื่น ๆ' ? document.getElementById('otherPrefix').value : document.getElementById('prefix').value);
                 formData.append('FirstName', document.getElementById('firstName').value.trim());
                 formData.append('LastName', document.getElementById('lastName').value.trim());
@@ -767,25 +784,30 @@
                 formData.append('Username', document.getElementById('testUsernameInput').value.trim());
                 formData.append('Password', phone.slice(-4));
 
-                fetch(SCRIPT_URL, { method: 'POST', body: formData})
-                    .then(response => response.json())
-                    .then(result => {
-                        if(result.status === 'success') {
-                            lastSuccessfulRegistration = Object.fromEntries(formData.entries());
-                            initializeDataFromSheet();
-                            modalBody.innerHTML = `<div class="success-popup-card"><div class="success-checkmark-icon"><i class="bi bi-check-lg"></i></div><h4 class="text-success">ลงทะเบียนสำเร็จ</h4><p class="text-muted">ข้อมูลของท่านถูกบันทึกเรียบร้อยแล้ว</p><button class="btn btn-success mt-3" id="finalOkBtn">ตกลง</button></div>`;
-                            document.getElementById('finalOkBtn').onclick = () => {
-                                loadingModal.hide();
-                                document.getElementById('generatedUsername').textContent = lastSuccessfulRegistration.Username;
-                                document.getElementById('generatedPassword').textContent = lastSuccessfulRegistration.Password;
-                                document.getElementById('loadingModal').addEventListener('hidden.bs.modal', () => { switchPage('successPage'); launchConfetti(); }, { once: true });
-                            };
-                        } else { throw new Error(result.message || 'Unknown error occurred'); }
-                    })
-                    .catch(error => {
-                        console.error('Error!', error.message);
-                        modalBody.innerHTML = `<div class="success-popup-card" style="background-color: #fef2f2; border-color: #fecaca;"><h4 class="text-danger">เกิดข้อผิดพลาด</h4><p class="text-muted">ไม่สามารถส่งข้อมูลได้ กรุณาลองใหม่อีกครั้ง</p><button class="btn btn-danger mt-3" data-bs-dismiss="modal">ปิด</button></div>`;
-                    });
+                try {
+                    const response = await fetch(SCRIPT_URL, { method: 'POST', body: formData });
+                    const result = await response.json();
+                    if (result.status !== 'success') {
+                        throw new Error(result.message || 'Unknown error occurred');
+                    }
+                    
+                    lastSuccessfulRegistration = Object.fromEntries(formData.entries());
+                    
+                    // FIXED: Force a re-fetch of data to ensure the new user is included
+                    modalBody.innerHTML = `<div class="text-white text-center"><div class="spinner-border" role="status"></div><p class="mt-3 fs-5">กำลังอัปเดตข้อมูลล่าสุด...</p></div>`;
+                    await initializeDataFromSheet();
+
+                    modalBody.innerHTML = `<div class="success-popup-card"><div class="success-checkmark-icon"><i class="bi bi-check-lg"></i></div><h4 class="text-success">ลงทะเบียนสำเร็จ</h4><p class="text-muted">ข้อมูลของท่านถูกบันทึกเรียบร้อยแล้ว</p><button class="btn btn-success mt-3" id="finalOkBtn">ตกลง</button></div>`;
+                    document.getElementById('finalOkBtn').onclick = () => {
+                        loadingModal.hide();
+                        document.getElementById('generatedUsername').textContent = lastSuccessfulRegistration.Username;
+                        document.getElementById('generatedPassword').textContent = lastSuccessfulRegistration.Password;
+                        document.getElementById('loadingModal').addEventListener('hidden.bs.modal', () => { switchPage('successPage'); launchConfetti(); }, { once: true });
+                    };
+                } catch (error) {
+                    console.error('Error!', error.message);
+                    modalBody.innerHTML = `<div class="success-popup-card" style="background-color: #fef2f2; border-color: #fecaca;"><h4 class="text-danger">เกิดข้อผิดพลาด</h4><p class="text-muted">ไม่สามารถส่งข้อมูลได้ กรุณาลองใหม่อีกครั้ง</p><button class="btn btn-danger mt-3" data-bs-dismiss="modal">ปิด</button></div>`;
+                }
             }
             
             // --- ADMIN LOGIC ---
