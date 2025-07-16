@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>โครงการส่งเสริมการพัฒนาคุณภาพชีวิต</title>
+
+    <!-- Frameworks and Libraries -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- General Styles --- */
+        body {
+            font-family: 'Kanit', sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e6f7f4 100%);
+            color: #343a40;
+            overflow-x: hidden;
+        }
+        .page {
+            display: none; width: 100%; min-height: 100vh;
+            align-items: center; justify-content: center;
+            text-align: center; padding: 1rem;
+            animation: fadeIn 0.8s ease-in-out;
+        }
+        .page.active { display: flex; flex-direction: column; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.98) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        
+        /* --- Loading and Error Overlay --- */
+        #appLoader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(255, 255, 255, 0.9);
+            display: flex; flex-direction: column; justify-content: center;
+            align-items: center; z-index: 2000;
+            transition: opacity 0.3s;
+        }
+        #appLoader.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .spinner-border { width: 3rem; height: 3rem; }
+
+        .card-container {
+            background-color: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
+            border-radius: 20px; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+            padding: 2rem; width: 100%; max-width: 800px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .card-container.admin-card { max-width: 1200px; }
+        .footer-note {
+            position: fixed; bottom: 0; left: 0;
+            width: 100%; text-align: center; padding: 8px 0;
+            font-size: 0.8rem; color: #6c757d; opacity: 0.7;
+            z-index: 999; pointer-events: none;
+        }
+
+        /* --- Main Page Button Styles --- */
+        .realistic-red-button {
+            width: 180px; height: 180px; background: linear-gradient(145deg, #f85c58, #d13a36);
+            border-radius: 50%; border: 3px solid #b82e2a; color: white;
+            font-size: 1.8rem; font-weight: 700; text-shadow: 0 2px 3px rgba(0,0,0,0.3);
+            box-shadow: 0 12px 20px rgba(220, 53, 69, 0.3), inset 0 4px 6px rgba(255, 255, 255, 0.5), inset 0 -8px 15px rgba(139, 0, 0, 0.3);
+            cursor: pointer; transition: transform 0.15s ease-out, box-shadow 0.15s ease-out, background 0.2s ease;
+            display: flex; align-items: center; justify-content: center; margin-top: 2rem;
+        }
+        .realistic-red-button:hover { transform: scale(1.05) translateY(-5px); box-shadow: 0 18px 30px rgba(220, 53, 69, 0.35), inset 0 4px 6px rgba(255, 255, 255, 0.5), inset 0 -8px 15px rgba(139, 0, 0, 0.3); }
+        .realistic-red-button:active { transform: scale(0.98) translateY(4px); box-shadow: 0 4px 8px rgba(220, 53, 69, 0.4), inset 0 8px 15px rgba(0, 0, 0, 0.35); }
+        .realistic-red-button:disabled {
+            background: linear-gradient(145deg, #a8a8a8, #828282);
+            border-color: #6e6e6e;
+            cursor: not-allowed;
+            box-shadow: 0 6px 10px rgba(0,0,0,0.2), inset 0 4px 8px rgba(0,0,0,0.2);
+            transform: none;
+        }
+
+        .btn-3d {
+            font-weight: 500; padding: 12px 30px; border-radius: 50px; color: white;
+            border-style: solid; border-width: 2px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            transition: all 0.15s ease-out;
+        }
+        .btn-3d:disabled {
+            filter: grayscale(80%);
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+            opacity: 0.65;
+        }
+        .btn-3d-green { background-image: linear-gradient(45deg, #28a745, #52c41a); border-color: #1c7430; box-shadow: 0 6px 12px rgba(40, 167, 69, 0.3), inset 0 2px 2px rgba(255,255,255,0.4); }
+        .btn-3d-yellow { background-image: linear-gradient(45deg, #ffca2c, #ffdd72); border-color: #e0a800; color: #212529; box-shadow: 0 6px 12px rgba(255, 193, 7, 0.3), inset 0 2px 2px rgba(255,255,255,0.5); }
+        .btn-3d:not(:disabled):hover { transform: scale(1.05) translateY(-3px); }
+        .btn-3d-green:not(:disabled):hover { box-shadow: 0 10px 18px rgba(40, 167, 69, 0.4), inset 0 2px 2px rgba(255,255,255,0.4); }
+        .btn-3d-yellow:not(:disabled):hover { box-shadow: 0 10px 18px rgba(255, 193, 7, 0.4), inset 0 2px 2px rgba(255,255,255,0.5); }
+        .btn-3d:not(:disabled):active { transform: scale(0.98) translateY(1px); }
+        .btn-3d-green:not(:disabled):active { box-shadow: 0 3px 5px rgba(25, 135, 84, 0.3), inset 0 4px 8px rgba(0,0,0,0.2); }
+        .btn-3d-yellow:not(:disabled):active { box-shadow: 0 3px 5px rgba(255, 193, 7, 0.3), inset 0 4px 8px rgba(0,0,0,0.2); }
+        
+        /* --- Main Page Form Styles --- */
+        .form-control, .form-select { border-radius: 16px; border: 1px solid #e9ecef; background-color: #f8f9fa; padding: 12px 18px; transition: all 0.2s ease-in-out; box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.06); }
+        .form-control:focus, .form-select:focus { border-color: #a3d5ff; background-color: #fff; box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.06), 0 0 0 4px rgba(13, 110, 253, 0.15); outline: none; }
+        .choices__inner { border-radius: 16px; border: 1px solid #e9ecef; background-color: #f8f9fa; padding: 7px 7px 4px 10px; transition: all 0.2s ease-in-out; box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.06); min-height: auto; font-size: 1rem; }
+        .is-focused .choices__inner { border-color: #a3d5ff; background-color: #fff; box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.06), 0 0 0 4px rgba(13, 110, 253, 0.15); }
+        .choices__list--single { padding: 4px 16px 4px 4px; }
+        .choices__input { padding: 0; margin: 0; background-color: transparent; }
+        #confirmationData ul, #testTakerDetails ul { list-style: none; padding: 0; }
+        #confirmationData li, #testTakerDetails li { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; }
+        #confirmationData .confirm-label, #testTakerDetails .confirm-label { font-weight: 500; color: #555; flex-shrink: 0; margin-right: 10px; }
+        #confirmationData .confirm-value, #testTakerDetails .confirm-value { color: #000; text-align: right; word-break: break-word; }
+
+        /* --- Admin & Success Styles --- */
+        #adminLoginBtn { position: fixed; bottom: 15px; left: 15px; width: 45px; height: 45px; background-color: #6c757d; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.2); transition: all 0.3s ease; z-index: 1050; opacity: 0.7; }
+        #adminLoginBtn:hover { transform: scale(1.1); opacity: 1; }
+        
+        /* FIXED: Rocket Animation Styles */
+        .rocket-container { position: relative; width: 150px; height: 300px; margin: 0 auto; animation: launch 2s ease-in-out forwards; }
+        @keyframes launch { 0% { transform: translateY(100px); opacity: 0; } 20% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-400px); opacity: 0; } }
+        .rocket-body { font-size: 6rem; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); z-index: 2; }
+        .rocket-trail { position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%); width: 30px; height: 120px; background: linear-gradient(to top, #ffb74d, transparent); border-radius: 50% 50% 0 0; filter: blur(5px); z-index: 1; }
+        
+        .success-popup-card { background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 16px; padding: 2rem; text-align: center; animation: popInSuccess 0.5s ease-out; }
+        @keyframes popInSuccess { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+        .success-checkmark-icon { width: 70px; height: 70px; border-radius: 50%; background-color: #dcfce7; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: #22c55e; margin: 0 auto 1rem; }
+        #confetti-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+        
+        /* --- Styles for Test Pages (Pre & Post) --- */
+        .test-body {
+            font-family: 'Kanit', sans-serif; /* Tailwind may override this, so we ensure it's set */
+            background-color: #f1f5f9; /* bg-slate-100 */
+        }
+        .test-screen { display: none; }
+        .test-screen.active { display: block; }
+        .test-btn-3d { position: relative; border-radius: 12px; border: 1px solid rgba(0,0,0,0.1); border-bottom-width: 4px; transition: all 0.1s ease-out; text-shadow: 0 -1px 0 rgba(0,0,0,0.15); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .test-btn-3d:active { transform: translateY(3px); border-bottom-width: 1px; filter: brightness(0.95); box-shadow: none; }
+
+        /* Scoped Pre-Test Styles */
+        #preTestPage .quiz-option { transition: all 0.2s ease-in-out; display: flex; justify-content: space-between; align-items: center; }
+        #preTestPage .quiz-option:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08); }
+        #preTestPage .quiz-option.selected { background-color: #ECFDF5; border-color: #10B981; border-width: 2px; transform: scale(1.03); box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3); }
+        #preTestPage .quiz-option.selected .option-text { color: #065F46; font-weight: 600; }
+        #preTestPage .quiz-option .checkmark { display: none; width: 28px; height: 28px; border-radius: 50%; background-color: #10B981; color: white; justify-content: center; align-items: center; font-weight: bold; font-size: 1.2rem; }
+        #preTestPage .quiz-option.selected .checkmark { display: flex; }
+        #preTestPage .sk-chase { width: 60px; height: 60px; position: relative; animation: sk-chase 2.5s infinite linear both; }
+        #preTestPage .sk-chase-dot { width: 100%; height: 100%; position: absolute; left: 0; top: 0; animation: sk-chase-dot 2.0s infinite ease-in-out both; }
+        #preTestPage .sk-chase-dot:before { content: ''; display: block; width: 25%; height: 25%; background-color: #10B981; border-radius: 100%; animation: sk-chase-dot-before 2.0s infinite ease-in-out both; }
+
+        /* Scoped Post-Test Styles */
+        #postTestPage .quiz-option { transition: all 0.2s ease-in-out; display: flex; justify-content: space-between; align-items: center; }
+        #postTestPage .quiz-option:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08); }
+        #postTestPage .quiz-option.selected { background-color: #EFF6FF; border-color: #3B82F6; border-width: 2px; transform: scale(1.03); box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3); }
+        #postTestPage .quiz-option.selected .option-text { color: #1E40AF; font-weight: 600; }
+        #postTestPage .quiz-option .checkmark { display: none; width: 28px; height: 28px; border-radius: 50%; background-color: #3B82F6; color: white; justify-content: center; align-items: center; font-weight: bold; font-size: 1.2rem; }
+        #postTestPage .quiz-option.selected .checkmark { display: flex; }
+        #postTestPage .sk-chase { width: 60px; height: 60px; position: relative; animation: sk-chase 2.5s infinite linear both; }
+        #postTestPage .sk-chase-dot { width: 100%; height: 100%; position: absolute; left: 0; top: 0; animation: sk-chase-dot 2.0s infinite ease-in-out both; }
+        #postTestPage .sk-chase-dot:before { content: ''; display: block; width: 25%; height: 25%; background-color: #3B82F6; border-radius: 100%; animation: sk-chase-dot-before 2.0s infinite ease-in-out both; }
+        
+        /* Star Rating for Post-Test Evaluation */
+        #postTestPage .star-rating .star { position: relative; display: inline-flex; justify-content: center; align-items: center; width: 44px; height: 44px; cursor: pointer; }
+        #postTestPage .star-rating .star-svg { width: 40px; height: 40px; fill: #d1d5db; transition: all 0.2s ease; }
+        #postTestPage .star-rating .star-number { position: absolute; font-size: 0.9rem; font-weight: 600; color: #6b7280; user-select: none; transition: all 0.2s ease; }
+        #postTestPage .star-rating .star:hover .star-svg, #postTestPage .star-rating .star.hover .star-svg { fill: #fde68a; transform: scale(1.1); }
+        #postTestPage .star-rating .star.selected .star-svg { fill: #f59e0b; transform: scale(1.1); }
+        #postTestPage .star-rating .star.selected .star-number { color: white; text-shadow: 0 0 2px rgba(0,0,0,0.5); }
+        
+        /* Shared Animation for Tests */
+        .sk-chase-dot:nth-child(1) { animation-delay: -1.1s; } .sk-chase-dot:nth-child(2) { animation-delay: -1.0s; } .sk-chase-dot:nth-child(3) { animation-delay: -0.9s; }
+        .sk-chase-dot:nth-child(4) { animation-delay: -0.8s; } .sk-chase-dot:nth-child(5) { animation-delay: -0.7s; } .sk-chase-dot:nth-child(6) { animation-delay: -0.6s; }
+        .sk-chase-dot:nth-child(1):before { animation-delay: -1.1s; } .sk-chase-dot:nth-child(2):before { animation-delay: -1.0s; } .sk-chase-dot:nth-child(3):before { animation-delay: -0.9s; }
+        .sk-chase-dot:nth-child(4):before { animation-delay: -0.8s; } .sk-chase-dot:nth-child(5):before { animation-delay: -0.7s; } .sk-chase-dot:nth-child(6):before { animation-delay: -0.6s; }
+        @keyframes sk-chase { 100% { transform: rotate(360deg); } }
+        @keyframes sk-chase-dot { 80%, 100% { transform: rotate(360deg); } }
+        @keyframes sk-chase-dot-before { 50% { transform: scale(0.4); } 100%, 0% { transform: scale(1.0); } }
+    </style>
+</head>
+<body>
+    <!-- NEW: App Loader Overlay -->
+    <div id="appLoader">
+        <div id="loaderContent">
+            <div class="d-flex justify-content-center mb-3">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+            <p id="loaderText" class="text-muted">กำลังโหลดข้อมูล...</p>
+        </div>
+        <div id="errorContent" class="text-center" style="display: none;">
+             <i class="bi bi-wifi-off fs-1 text-danger mb-3"></i>
+             <h5 class="mb-3">เกิดข้อผิดพลาดในการเชื่อมต่อ</h5>
+             <p class="text-muted small mb-4">ไม่สามารถดึงข้อมูลจากฐานข้อมูลได้<br>กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ตและลองอีกครั้ง</p>
+             <button id="retryBtn" class="btn btn-primary">ลองใหม่</button>
+        </div>
+    </div>
+
+    <!-- Admin Login Button (only on intro page) -->
+    <div id="adminLoginBtn" title="Admin Login"><i class="bi bi-gear-fill"></i></div>
+
+    <!-- Page 1: Intro -->
+    <div id="introPage" class="page">
+        <div class="card-container">
+            <!-- FIXED: Logo centering -->
+            <div class="d-flex justify-content-center">
+                <img src="https://i.postimg.cc/W3NJNwNp/IMG-3164.png" class="mb-4 rounded-circle shadow-sm" alt="โลโก้โครงการ" style="width: 120px; height: 120px; object-fit: cover;">
+            </div>
+            <h1 class="h2">🌿 โครงการส่งเสริมการพัฒนาคุณภาพชีวิต สุขภาพดี ตามวิถีธรรมชาติ</h1>
+            <div class="project-details mt-4">
+                <p class="mb-1"><strong><i class="bi bi-calendar-event"></i> วันที่:</strong> 24 - 25 กรกฎาคม 2568</p>
+                <p><strong><i class="bi bi-geo-alt-fill"></i> สถานที่:</strong> ห้องประชุม ชั้น 8 อาคาร 72 ปี กรมธนารักษ์</p>
+            </div>
+            <div class="d-flex justify-content-center">
+                <button id="registerButton" class="realistic-red-button">ลงทะเบียน</button>
+            </div>
+            <div class="d-flex justify-content-center gap-3 mt-4">
+                <button id="preTestBtn" class="btn btn-3d btn-3d-green">Pre-Test</button>
+                <button id="postTestBtn" class="btn btn-3d btn-3d-yellow">Post-Test</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page 2: Registration Form -->
+    <div id="registerPage" class="page">
+        <div class="card-container">
+            <h2 class="mb-4" style="color: #0d6efd;">ระบบลงทะเบียน</h2>
+            <form id="registrationForm" novalidate>
+                 <div class="row g-3">
+                     <div class="col-12">
+                         <label class="form-label">👤 คำนำหน้าชื่อ</label>
+                         <div class="input-group">
+                             <select class="form-select" id="prefix" required>
+                                 <option value="" disabled selected>เลือก...</option>
+                                 <option value="นาย">นาย</option>
+                                 <option value="นาง">นาง</option>
+                                 <option value="นางสาว">นางสาว</option>
+                                 <option value="อื่น ๆ">อื่น ๆ</option>
+                             </select>
+                             <input type="text" class="form-control" id="otherPrefix" placeholder="ระบุคำนำหน้า" style="display: none;">
+                         </div>
+                     </div>
+                     <div class="col-md-6">
+                         <label for="firstName" class="form-label">ชื่อ</label>
+                         <input type="text" class="form-control" id="firstName" placeholder="ชื่อจริง" required>
+                     </div>
+                      <div class="col-md-6">
+                         <label for="lastName" class="form-label">นามสกุล</label>
+                         <input type="text" class="form-control" id="lastName" placeholder="นามสกุล" required>
+                     </div>
+                     <div class="col-12"><label class="form-label">🏢 หน่วยงาน/สังกัด</label><select id="department" required></select></div>
+                     <div class="col-12"><label class="form-label">🧑‍💼 ประเภทบุคลากร</label><select class="form-select" id="personnelType" required><option value="" disabled selected>กรุณาเลือก...</option><option>ข้าราชการ</option><option>พนักงานราชการ/พนักงานเงินทุนหมุนเวียน</option><option>ลูกจ้างประจำ</option><option>ลูกจ้างชั่วคราว</option></select></div>
+                     <div class="col-12"><label class="form-label">📞 หมายเลขโทรศัพท์</label><input type="tel" class="form-control" id="phone" placeholder="ระบุเฉพาะตัวเลข 10 หลัก" maxlength="10" pattern="\d{10}" required></div>
+                     <div class="col-12">
+                         <label for="testUsernameInput" class="form-label">ชื่อผู้ใช้งานระบบแบบทดสอบ</label>
+                         <input type="text" class="form-control" id="testUsernameInput" placeholder="ขั้นต่ำ 4 ตัวอักษร" required minlength="4">
+                         <div class="form-text text-muted">(สามารถใช้อักษรภาษาอังกฤษ, ตัวเลข, อักขระพิเศษ ได้เท่านั้น)</div>
+                     </div>
+                     <div class="col-12 text-start"><label class="form-label">🍽️ ข้อมูลการแพ้อาหาร/อิสลาม</label><div class="form-check"><input class="form-check-input" type="radio" name="foodInfo" id="foodMuslim" value="อิสลาม/มุสลิม" required><label class="form-check-label" for="foodMuslim">อิสลาม/มุสลิม</label></div><div class="form-check"><input class="form-check-input" type="radio" name="foodInfo" id="foodNone" value="ไม่แพ้อาหาร" required><label class="form-check-label" for="foodNone">ไม่แพ้อาหาร</label></div><div class="form-check"><input class="form-check-input" type="radio" name="foodInfo" id="foodAllergy" value="แพ้อาหาร" required><label class="form-check-label" for="foodAllergy">แพ้อาหาร</label></div><input type="text" class="form-control mt-2" id="allergyDetails" placeholder="โปรดระบุอาหารที่แพ้" style="display: none;"></div>
+                 </div>
+                 <button type="submit" class="btn btn-3d btn-3d-green mt-4">ส่งข้อมูลการลงทะเบียน</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Page 3: Success -->
+    <div id="successPage" class="page">
+        <canvas id="confetti-canvas"></canvas>
+        <div class="card-container" style="background-color: #f0fdf4; border-color: #bbf7d0;">
+            <!-- FIXED: Checkmark icon -->
+            <div class="success-checkmark-icon mb-3"><i class="bi bi-patch-check-fill"></i></div>
+            <h2 class="display-5 text-success">คุณลงทะเบียนสำเร็จ!</h2>
+            <!-- FIXED: Emoji -->
+            <div class="celebration-emojis" style="font-size: 2.5rem; margin-top: 0.5rem;">🎉🥳🎊✨</div>
+            <p class="lead mt-3 text-secondary">ขอขอบคุณสำหรับการลงทะเบียน</p>
+            
+            <div id="credentialsContainer" class="alert alert-primary mt-4 text-start">
+                <h5 class="alert-heading"><i class="bi bi-person-badge"></i> ข้อมูลสำหรับเข้าใช้งาน</h5>
+                <p class="mb-1"><strong>Username:</strong> <span id="generatedUsername"></span></p>
+                <p class="mb-0"><strong>Password:</strong> <span id="generatedPassword"></span></p>
+                <hr>
+                <p class="mb-0 small">โปรดบันทึก username และ password เพื่อใช้ในการทำแบบทดสอบก่อน/หลัง และแบบประเมินการฝึกอบรมต่อไป</p>
+            </div>
+
+            <div class="alert alert-light mt-3 text-start border-success border-opacity-25">
+                <h5 class="alert-heading text-success"><i class="bi bi-bell-fill"></i> การแจ้งเตือนนัดหมาย</h5>
+                <p>โปรดบันทึกข้อมูลเพื่อเข้าร่วมโครงการ:</p><hr>
+                <p class="mb-1"><strong>โครงการ:</strong> ส่งเสริมการพัฒนาคุณภาพชีวิต สุขภาพดี ตามวิถีธรรมชาติ</p>
+                <p class="mb-1"><strong>วันที่:</strong> 24 - 25 กรกฎาคม 2568</p>
+                <p class="mb-0"><strong>สถานที่:</strong> ห้องประชุม ชั้น 8 อาคาร 72 ปี กรมธนารักษ์</p>
+            </div>
+            <div class="d-flex justify-content-center align-items-center flex-wrap gap-2 mt-3">
+                <button id="addToCalendarBtn" class="btn btn-success"><i class="bi bi-calendar-plus"></i> เพิ่มไปยังปฏิทิน</button>
+                <button id="backToHomeBtn" class="btn btn-link text-secondary"><i class="bi bi-house-door"></i> กลับไปยังหน้าแรก</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page 4: Admin Dashboard -->
+    <div id="adminDashboardPage" class="page">
+        <div class="card-container admin-card">
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+                <h3 class="mb-2 mb-md-0"><i class="bi bi-speedometer2"></i> Admin Dashboard</h3>
+                <div>
+                    <button id="refreshAdminDataBtn" class="btn btn-sm btn-primary me-2"><i class="bi bi-arrow-clockwise"></i> รีเฟรชข้อมูล</button>
+                    <button id="adminLogoutBtn" class="btn btn-sm btn-outline-danger"><i class="bi bi-box-arrow-right"></i> ออกจากระบบ</button>
+                </div>
+            </div>
+            
+            <div id="systemControlsSection" class="p-4 mb-4 border rounded-3 bg-light">
+                <h5 class="mb-3"><i class="bi bi-toggles2"></i> การตั้งค่าระบบ (System Controls)</h5>
+                <div id="systemControlsContainer" class="d-flex flex-column flex-md-row justify-content-around align-items-center gap-3">
+                    <!-- Toggles will be inserted here by JavaScript -->
+                </div>
+                <div id="settingsSaveStatus" class="mt-3 small text-muted"></div>
+            </div>
+
+            <div id="registeredUsersSection" class="mt-4"></div>
+        </div>
+    </div>
+
+    <!-- Page 5: Test Taker Info Page -->
+    <div id="testTakerInfoPage" class="page">
+        <div class="card-container">
+            <h2 id="testTakerHeader" class="mb-4" style="color: #0d6efd;"></h2>
+            <div id="testTakerDetails" class="text-start"></div>
+            <button id="startTestBtn" class="btn btn-primary mt-4 w-100">ยืนยันและเริ่มทำแบบทดสอบ</button>
+        </div>
+    </div>
+
+    <!-- Page 6: Pre-Test Page -->
+    <div id="preTestPage" class="page test-body">
+         <div id="pre-app-container" class="w-full max-w-2xl mx-auto">
+             <div id="pre-start-screen" class="test-screen text-center bg-white p-8 rounded-2xl shadow-xl">
+                 <h1 class="text-4xl font-bold text-emerald-600 mb-4">แบบทดสอบก่อนเรียน (Pre-Test)</h1>
+                 <p class="text-slate-600 mb-8 text-lg">หัวข้อ: การสร้างเสริมสุขภาพกายและสุขภาพจิตที่ดี</p>
+                 <button id="pre-start-btn" class="w-full bg-emerald-500 text-white font-bold py-3 px-6 hover:bg-emerald-600 border-emerald-700 test-btn-3d text-xl">เริ่มทำแบบทดสอบ</button>
+             </div>
+ 
+             <div id="pre-quiz-screen" class="test-screen bg-white p-6 sm:p-8 rounded-2xl shadow-xl">
+                 <div class="mb-6">
+                     <div class="flex justify-between mb-1"><span class="text-base font-medium text-emerald-700">คำถามข้อที่ <span id="pre-current-q-number">1</span> จาก 10</span><span class="text-sm font-medium text-emerald-700"><span id="pre-progress-percent">10</span>%</span></div>
+                     <div class="w-full bg-slate-200 rounded-full h-2.5"><div id="pre-progress-bar" class="bg-emerald-500 h-2.5 rounded-full transition-all duration-300" style="width: 10%"></div></div>
+                 </div>
+                 <h2 id="pre-question-text" class="text-2xl font-semibold mb-6 text-slate-800"></h2>
+                 <div id="pre-options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6"></div>
+                 <div id="pre-alert-message" style="display: none;" class="text-center text-red-500 font-semibold p-3 mb-4 bg-red-100 rounded-lg">กรุณาเลือกคำตอบก่อน</div>
+                 <button id="pre-next-btn" class="w-full bg-emerald-500 text-white font-bold py-3 px-6 hover:bg-emerald-600 border-emerald-700 test-btn-3d text-lg">ข้อถัดไป</button>
+             </div>
+ 
+             <div id="pre-processing-screen" class="test-screen text-center bg-white p-12 rounded-2xl shadow-xl">
+                 <div class="flex justify-center items-center mb-6"><div class="sk-chase"><div class="sk-chase-dot"></div><div class="sk-chase-dot"></div><div class="sk-chase-dot"></div><div class="sk-chase-dot"></div><div class="sk-chase-dot"></div><div class="sk-chase-dot"></div></div></div>
+                 <h2 id="pre-processing-text" class="text-2xl font-semibold text-slate-700">กำลังประมวลผลคะแนน</h2><p class="text-slate-500">กรุณารอสักครู่...</p>
+             </div>
+ 
+             <div id="pre-result-screen" class="test-screen text-center bg-white p-8 sm:p-12 rounded-2xl shadow-xl relative overflow-hidden">
+                 <canvas id="pre-confetti-canvas" class="absolute top-0 left-0 w-full h-full pointer-events-none"></canvas>
+                 <h2 id="pre-result-title" class="text-4xl font-bold mb-4"></h2>
+                 <p class="text-slate-600 text-xl mb-2">คุณทำคะแนนได้</p>
+                 <p class="text-6xl font-bold text-emerald-500 mb-6"><span id="pre-score-text">0</span> / 10</p>
+                 <p id="pre-result-message" class="text-lg text-slate-500 mb-8"></p>
+                 <button id="pre-finish-btn" class="w-full bg-slate-700 text-white font-bold py-3 px-6 hover:bg-slate-800 border-slate-900 test-btn-3d text-xl">กลับหน้าหลัก</button>
+             </div>
+         </div>
+    </div>
+    
+    <!-- Page 7: Post-Test Page -->
+    <div id="postTestPage" class="page test-body">
+         <div id="post-app-container" class="w-full max-w-2xl mx-auto">
+             <div id="post-start-screen" class="test-screen text-center bg-white p-8 rounded-2xl shadow-xl">
+                 <h1 class="text-4xl font-bold text-blue-600 mb-4">แบบทดสอบหลังเรียน (Post-Test)</h1>
+                 <p class="text-slate-600 mb-8 text-lg">มาทบทวนความรู้กันอีกครั้ง!</p>
+                 <button id="post-start-btn" class="w-full bg-blue-500 text-white font-bold py-3 px-6 hover:bg-blue-600 border-blue-700 test-btn-3d text-xl">เริ่มทำแบบทดสอบ</button>
+             </div>
+ 
+             <div id="post-quiz-screen" class="test-screen bg-white p-6 sm:p-8 rounded-2xl shadow-xl">
+                  <div class="mb-6">
+                      <div class="flex justify-between mb-1"><span class="text-base font-medium text-blue-700">คำถามข้อที่ <span id="post-current-q-number">1</span> จาก 10</span><span class="text-sm font-medium text-blue-700"><span id="post-progress-percent">10</span>%</span></div>
+                      <div class="w-full bg-slate-200 rounded-full h-2.5"><div id="post-progress-bar" class="bg-blue-500 h-2.5 rounded-full transition-all duration-300" style="width: 10%"></div></div>
+                  </div>
+                 <h2 id="post-question-text" class="text-2xl font-semibold mb-6 text-slate-800"></h2>
+                 <div id="post-options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6"></div>
+                 <div id="post-alert-message" style="display: none;" class="text-center text-red-500 font-semibold p-3 mb-4 bg-red-100 rounded-lg">กรุณาเลือกคำตอบก่อน</div>
+                 <button id="post-next-btn" class="w-full bg-blue-500 text-white font-bold py-3 px-6 hover:bg-blue-600 border-blue-700 test-btn-3d text-lg">ข้อถัดไป</button>
+             </div>
+ 
+             <div id="post-processing-screen" class="test-screen text-center bg-white p-12 rounded-2xl shadow-xl">
+                 <div class="flex justify-center items-center mb-6"><div class="sk-chase"><div class="sk-chase-dot"></div><div class="sk-chase-dot"></div><div class="sk-chase-dot"></div><div class="sk-chase-dot"></div><div class="sk-chase-dot"></div><div class="sk-chase-dot"></div></div></div>
+                 <h2 id="post-processing-text" class="text-2xl font-semibold text-slate-700">กำลังประมวลผลคะแนน</h2><p class="text-slate-500">กรุณารอสักครู่...</p>
+             </div>
+ 
+             <div id="post-result-screen" class="test-screen text-center bg-white p-8 sm:p-12 rounded-2xl shadow-xl relative overflow-hidden">
+                 <canvas id="post-confetti-canvas" class="absolute top-0 left-0 w-full h-full pointer-events-none"></canvas>
+                 <h2 id="post-result-title" class="text-4xl font-bold mb-4"></h2>
+                 <p class="text-slate-600 text-xl mb-2">คุณทำคะแนนได้</p>
+                 <p class="text-6xl font-bold text-blue-500 mb-6"><span id="post-score-text">0</span> / 10</p>
+                 <p id="post-result-message" class="text-lg text-slate-500 mb-8"></p>
+                 <button id="post-evaluation-start-btn" class="w-full bg-slate-700 text-white font-bold py-3 px-6 hover:bg-slate-800 border-slate-900 test-btn-3d text-xl">ทำแบบประเมินโครงการ</button>
+             </div>
+ 
+             <div id="post-evaluation-start-screen" class="test-screen text-center bg-white p-8 rounded-2xl shadow-xl">
+                 <h1 class="text-4xl font-bold text-purple-600 mb-4">แบบประเมินโครงการ</h1>
+                 <p class="text-slate-600 mb-8 text-lg">โปรดสละเวลาสักครู่เพื่อประเมินความพึงพอใจ<br>ความคิดเห็นของท่านมีค่าเพื่อการพัฒนาต่อไป</p>
+                 <button id="post-start-evaluation-btn" class="w-full bg-purple-500 text-white font-bold py-3 px-6 hover:bg-purple-600 border-purple-700 test-btn-3d text-xl">เริ่มทำแบบประเมิน</button>
+             </div>
+ 
+             <div id="post-evaluation-screen" class="test-screen bg-white p-6 sm:p-8 rounded-2xl shadow-xl">
+                 <h2 class="text-2xl font-bold text-center mb-6 text-purple-700">ประเมินความพึงพอใจ</h2>
+                 <div id="post-evaluation-questions-container" class="space-y-6 mb-8"></div>
+                 <div id="evaluation-alert-message" style="display: none;" class="text-center text-red-500 font-semibold p-3 mb-4 bg-red-100 rounded-lg">กรุณาให้คะแนนทุกหัวข้อ</div>
+                 <button id="post-submit-evaluation-btn" class="w-full bg-purple-500 text-white font-bold py-3 px-6 hover:bg-purple-600 border-purple-700 test-btn-3d text-lg">ส่งแบบประเมิน</button>
+             </div>
+ 
+             <div id="post-final-screen" class="test-screen text-center bg-white p-12 rounded-2xl shadow-xl relative overflow-hidden">
+                  <canvas id="post-final-confetti-canvas" class="absolute top-0 left-0 w-full h-full pointer-events-none"></canvas>
+                 <div class="text-6xl mb-4">🎉</div>
+                 <h1 class="text-3xl font-bold text-emerald-600 mb-4">ยินดีด้วย!</h1>
+                 <p class="text-slate-600 text-lg">คุณผ่านการฝึกอบรมเรียบร้อยแล้ว<br>ขอขอบคุณที่เข้าร่วมโครงการกับเรา</p>
+                 <button id="post-finish-btn" class="mt-8 w-full max-w-xs mx-auto bg-slate-700 text-white font-bold py-3 px-6 hover:bg-slate-800 border-slate-900 test-btn-3d text-xl">กลับหน้าหลัก</button>
+             </div>
+         </div>
+    </div>
+
+
+    <!-- All Modals -->
+    <div id="modalsContainer">
+        <div class="modal fade" id="adminLoginModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Admin Login</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><form id="adminLoginForm"><div class="mb-3"><label class="form-label">Username</label><input type="text" class="form-control" id="adminUsername" required></div><div class="mb-3"><label class="form-label">Password</label><input type="password" class="form-control" id="adminPassword" required></div><button type="submit" class="btn btn-primary w-100">Login</button></form></div></div></div></div>
+        <div class="modal fade" id="passwordConfirmModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">ยืนยันการกระทำ</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="mb-3"><label class="form-label">กรุณากรอกรหัสผ่าน Admin เพื่อยืนยัน</label><input type="password" class="form-control" id="confirmAdminPassword"></div><div id="passwordConfirmError" class="text-danger d-none">รหัสผ่านไม่ถูกต้อง</div></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button><button type="button" class="btn btn-danger" id="executeConfirmBtn">ยืนยัน</button></div></div></div></div>
+        <div class="modal fade" id="confirmationModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content" style="border-radius: 16px;"><div class="modal-header" style="background-color: #e0f7fa; color: #007bff;"><h5 class="modal-title"><i class="bi bi-check2-circle me-2"></i>กรุณาตรวจสอบข้อมูล</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body" id="confirmationData"></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">กลับไปแก้ไข</button><button type="button" class="btn btn-success" id="confirmSubmitBtn">ยืนยัน</button></div></div></div></div>
+        <div class="modal fade" id="errorModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content" style="border-radius: 16px;"><div class="modal-header text-white bg-danger"><h5 class="modal-title"><i class="bi bi-exclamation-triangle-fill"></i> ข้อมูลไม่ครบถ้วน</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body" id="errorList"></div></div></div></div>
+        <div class="modal fade" id="loadingModal" tabindex="-1" data-bs-backdrop="static"><div class="modal-dialog modal-dialog-centered"><div class="modal-content bg-transparent border-0"><div class="modal-body" id="loadingModalBody"></div></div></div></div>
+        <div class="modal fade" id="duplicateModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content" style="border-radius: 16px;"><div class="modal-header bg-danger text-white"><h5 class="modal-title"><i class="bi bi-exclamation-octagon-fill"></i> พบข้อมูลซ้ำ</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body text-center"><p class="fs-5 mb-2">ท่านลงทะเบียนด้วยชื่อและนามสกุลนี้แล้ว</p><p class="text-muted small mt-3">หากท่านต้องการแก้ไขข้อมูล กรุณาติดต่อเจ้าหน้าที่</p></div></div></div></div>
+        <!-- Test Login Modal -->
+        <div class="modal fade" id="testLoginModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">เข้าสู่ระบบแบบทดสอบ</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><form id="testLoginForm"><div class="mb-3"><label class="form-label">Username</label><input type="text" class="form-control" id="testUsername" placeholder="username ที่กำหนดจากการลงทะเบียน" required></div><div class="mb-3"><label class="form-label">Password</label><input type="password" class="form-control" id="testPassword" placeholder="หมายเลขโทรศัพท์ 4 ตัวท้าย" required></div><button type="submit" class="btn btn-primary w-100">Login</button></form><div class="text-center mt-3"><a href="#" id="forgotPasswordLink">หากลืมชื่อผู้ใช้ หรือรหัสผ่าน กดที่นี่!</a></div></div></div></div></div>
+        <!-- Test Wait Modal -->
+        <div class="modal fade" id="testWaitModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content" style="border-radius: 16px; background-color: #fff0f5;"><div class="modal-body text-center p-4"><img src="https://i.postimg.cc/BnG8Xg18/IMG-3180.png" class="mb-3 rounded-circle" style="width:100px; height:100px; object-fit:cover;" alt="Cartoon Character"><h5 class="modal-title">ใจเย็น ๆ น้า</h5><p>ระบบยังไม่เปิดให้บริการ หรือ ข้อมูลผู้ใช้ไม่ถูกต้อง</p><div class="d-flex justify-content-center gap-2 mt-3"><button type="button" class="btn btn-danger btn-sm" data-bs-dismiss="modal">ปิด</button><button id="waitModalBackToHomeBtn" class="btn btn-link text-secondary btn-sm">กลับหน้าแรก</button></div></div></div></div></div>
+        <!-- Forgot Password Modal -->
+        <div class="modal fade" id="forgotPasswordModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">ค้นหาข้อมูลผู้ใช้งาน</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><form id="forgotPasswordForm"><div class="mb-3"><label class="form-label">ชื่อ</label><input type="text" class="form-control" id="recoveryFirstName" placeholder="ชื่อจริง (ไม่ต้องมีคำนำหน้า)" required></div><div class="mb-3"><label class="form-label">นามสกุล</label><input type="text" class="form-control" id="recoveryLastName" placeholder="นามสกุล" required></div><div class="mb-3"><label class="form-label">หมายเลขโทรศัพท์</label><input type="tel" class="form-control" id="recoveryPhone" placeholder="0812345678" required></div><button type="submit" class="btn btn-info w-100">ค้นหา</button></form><div id="recoveryResult" class="mt-3"></div></div><div class="modal-footer"><button type="button" class="btn btn-secondary" id="backToLoginBtn">กลับไปยังหน้าเข้าสู่ระบบ</button></div></div></div></div>
+        <!-- Feature Closed Modal -->
+        <div class="modal fade" id="featureClosedModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">แจ้งเตือน</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body text-center"><p class="fs-5">ฟังก์ชันนี้ปิดให้บริการชั่วคราว</p></div></div></div></div>
+    </div>
+    
+    <div class="footer-note">
+        หมายเหตุ: หากไม่สามารถทำรายการได้ กรุณารีเฟรชบราวเซอร์และทำรายการอีกครั้ง
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- STATE MANAGEMENT ---
+            const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxTlcy-zaKUovgVlbZFFd1VxMN_srZQrDtazmlw8xkjbwulv656yLQkz_wgRMR-IRHO/exec'; // <-- PASTE YOUR NEW URL HERE
+            let departmentNames = ["กองกฎหมาย", "กองกษาปณ์", "กองเทคโนโลยีและสำรวจฐานข้อมูลราชพัสดุ", "กองประเมินราคาทรัพย์สิน", "กองบริหารการคลัง", "กองบริหารจัดการกรรมสิทธิ์ที่ราชพัสดุ", "กองบริหารทรัพยากรบุคคล", "กองบริหารที่ราชพัสดุกรุงเทพมหานคร", "กองบริหารที่ราชพัสดุภูมิภาค", "กองบริหารเงินตรา", "กองพัฒนาธุรกิจและศักยภาพที่ราชพัสดุ", "กองพัฒนาและบำรุงรักษาอาคารราชพัสดุ", "กองยุทธศาสตร์และแผนงาน", "กองส่งเสริมและพัฒนาทรัพย์สินมีค่าของรัฐ", "กองมาตรฐานการประเมินราคาทรัพย์สิน", "กลุ่มงานตรวจราชการ", "กลุ่มตรวจสอบภายใน", "กลุ่มพัฒนาระบบบริหาร", "ศูนย์เทคโนโลยีสารสนเทศและการสื่อสาร", "สำนักงานเลขานุการกรม"];
+            let registeredUsers = [];
+            let appSettings = { isRegistrationOpen: true, isPreTestOpen: true, isPostTestOpen: true };
+            let choicesInstance = null;
+            let actionToConfirm = null;
+            let lastSuccessfulRegistration = null;
+            let currentTestType = null;
+            let currentUser = null;
+
+            // --- UI ELEMENTS ---
+            const appLoader = document.getElementById('appLoader');
+            const loaderContent = document.getElementById('loaderContent');
+            const errorContent = document.getElementById('errorContent');
+            const retryBtn = document.getElementById('retryBtn');
+
+            // --- INITIALIZATION ---
+            async function initialize() {
+                showLoader();
+                try {
+                    await initializeDataFromSheet();
+                    initializeChoices();
+                    setupEventListeners();
+                    preTestLogic.init();
+                    postTestLogic.init();
+                    switchPage('introPage'); // Show intro page only after successful load
+                    hideLoader();
+                } catch (error) {
+                    console.error("Initialization failed:", error);
+                    showError(error.message);
+                }
+            }
+            
+            retryBtn.addEventListener('click', initialize);
+
+            // --- LOADER & ERROR UI ---
+            function showLoader() {
+                appLoader.classList.remove('hidden');
+                loaderContent.style.display = 'block';
+                errorContent.style.display = 'none';
+            }
+            function hideLoader() {
+                appLoader.classList.add('hidden');
+            }
+            function showError(message) {
+                appLoader.classList.remove('hidden');
+                loaderContent.style.display = 'none';
+                errorContent.style.display = 'block';
+                console.error("Displaying error:", message);
+            }
+
+            // --- DATA & SETTINGS INITIALIZATION ---
+            async function initializeDataFromSheet() {
+                const response = await fetch(SCRIPT_URL);
+                if (!response.ok) {
+                    throw new Error(`Network error: ${response.statusText}`);
+                }
+                const result = await response.json();
+                if (result.status !== 'success') {
+                    throw new Error(`Script error: ${result.message}`);
+                }
+                
+                const data = result.data;
+                registeredUsers = data.users || [];
+                if (data.settings) {
+                    appSettings.isRegistrationOpen = data.settings.isRegistrationOpen === true || String(data.settings.isRegistrationOpen).toUpperCase() === 'TRUE';
+                    appSettings.isPreTestOpen = data.settings.isPreTestOpen === true || String(data.settings.isPreTestOpen).toUpperCase() === 'TRUE';
+                    appSettings.isPostTestOpen = data.settings.isPostTestOpen === true || String(data.settings.isPostTestOpen).toUpperCase() === 'TRUE';
+                }
+                
+                console.log('Data and settings loaded successfully!');
+                applyFeatureControls();
+            }
+            
+            // --- FEATURE CONTROL ---
+            function applyFeatureControls() {
+                const regBtn = document.getElementById('registerButton');
+                const preBtn = document.getElementById('preTestBtn');
+                const postBtn = document.getElementById('postTestBtn');
+
+                if(regBtn) regBtn.disabled = !appSettings.isRegistrationOpen;
+                if(preBtn) preBtn.disabled = !appSettings.isPreTestOpen;
+                if(postBtn) postBtn.disabled = !appSettings.isPostTestOpen;
+            }
+
+            function initializeChoices() {
+                const departmentSelect = document.getElementById('department');
+                if (departmentSelect && !choicesInstance) {
+                    choicesInstance = new Choices(departmentSelect, { 
+                        searchEnabled: true, itemSelectText: 'เลือก', allowHTML: true,
+                        placeholder: true, placeholderValue: 'พิมพ์เพื่อค้นหาหรือเลื่อนเพื่อเลือก...',
+                        searchPlaceholderValue: 'พิมพ์เพื่อค้นหา...',
+                    });
+                    
+                    const choices = departmentNames.sort((a,b) => a.localeCompare(b, 'th')).map(name => ({ value: name, label: name }));
+                    choices.unshift({ value: '', label: 'พิมพ์เพื่อค้นหาหรือเลื่อนเพื่อเลือก...', disabled: true, selected: true, placeholder: true });
+                    choicesInstance.setChoices(choices, 'value', 'label', false);
+                }
+            }
+            
+            function setupEventListeners() {
+                document.getElementById('registerButton')?.addEventListener('click', (e) => {
+                    if (e.currentTarget.disabled) { showModal('featureClosedModal'); return; }
+                    setTimeout(() => switchPage('registerPage'), 150);
+                });
+                
+                document.getElementById('preTestBtn')?.addEventListener('click', () => handleTestButtonClick('pre'));
+                document.getElementById('postTestBtn')?.addEventListener('click', () => handleTestButtonClick('post'));
+
+                document.getElementById('testLoginForm')?.addEventListener('submit', handleTestLoginSubmit);
+                document.getElementById('startTestBtn')?.addEventListener('click', handleStartTest);
+                document.getElementById('forgotPasswordLink')?.addEventListener('click', handleForgotPasswordLinkClick);
+                document.getElementById('forgotPasswordForm')?.addEventListener('submit', handleForgotPasswordSubmit);
+                document.getElementById('backToLoginBtn')?.addEventListener('click', () => {
+                    hideModal('forgotPasswordModal');
+                    showModal('testLoginModal');
+                });
+
+                document.getElementById('registrationForm')?.addEventListener('submit', handleRegistrationSubmit);
+                document.getElementById('confirmSubmitBtn')?.addEventListener('click', handleFinalSubmit);
+                
+                document.getElementById('adminLoginBtn').addEventListener('click', () => new bootstrap.Modal(document.getElementById('adminLoginModal')).show());
+                document.getElementById('adminLoginForm')?.addEventListener('submit', handleAdminLogin);
+                document.getElementById('executeConfirmBtn')?.addEventListener('click', handlePasswordConfirmation);
+                document.getElementById('adminLogoutBtn')?.addEventListener('click', handleAdminLogout);
+                document.getElementById('refreshAdminDataBtn')?.addEventListener('click', refreshAdminData);
+
+                document.getElementById('addToCalendarBtn')?.addEventListener('click', generateAndDownloadICS);
+                document.getElementById('backToHomeBtn')?.addEventListener('click', () => switchPage('introPage'));
+                document.getElementById('waitModalBackToHomeBtn')?.addEventListener('click', () => {
+                    hideModal('testWaitModal');
+                    switchPage('introPage');
+                });
+                
+                document.getElementById('prefix')?.addEventListener('change', (e) => {
+                    document.getElementById('otherPrefix').style.display = e.target.value === 'อื่น ๆ' ? 'block' : 'none';
+                });
+                document.querySelectorAll('input[name="foodInfo"]')?.forEach(radio => {
+                    radio.addEventListener('change', () => {
+                        document.getElementById('allergyDetails').style.display = document.getElementById('foodAllergy').checked ? 'block' : 'none';
+                    });
+                });
+
+                document.body.addEventListener('click', function(e) {
+                    const deleteBtn = e.target.closest('.delete-user-btn');
+                    if (deleteBtn) requestPasswordConfirmation({ type: 'deleteUser', payload: deleteBtn.dataset.id });
+                    
+                    const deleteSelectedBtn = e.target.closest('#deleteSelectedBtn');
+                    if (deleteSelectedBtn) {
+                        const selectedIds = Array.from(document.querySelectorAll('.user-checkbox:checked')).map(cb => cb.dataset.id);
+                        if (selectedIds.length > 0) {
+                            requestPasswordConfirmation({ type: 'deleteMultipleUsers', payload: selectedIds });
+                        } else {
+                            alert('กรุณาเลือกรายการที่ต้องการลบ');
+                        }
+                    }
+                });
+            }
+
+            // --- PAGE & MODAL MANAGEMENT ---
+            function switchPage(pageId) {
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                const page = document.getElementById(pageId);
+                if (page) {
+                    page.classList.add('active');
+                } else {
+                    document.getElementById('introPage').classList.add('active'); // Fallback to intro
+                }
+                document.getElementById('adminLoginBtn').style.display = (pageId === 'introPage') ? 'flex' : 'none';
+                if (pageId === 'introPage') {
+                    currentUser = null; // Reset current user when returning to home
+                    preTestLogic.showScreen('start');
+                    postTestLogic.showScreen('start');
+                }
+            }
+            function showModal(id) { new bootstrap.Modal(document.getElementById(id)).show(); }
+            function hideModal(id) {
+                const modalElement = document.getElementById(id);
+                const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                if (modalInstance) modalInstance.hide();
+            }
+
+            // --- TEST LOGIC INTEGRATION ---
+            function handleTestButtonClick(testType) {
+                if ((testType === 'pre' && !appSettings.isPreTestOpen) || (testType === 'post' && !appSettings.isPostTestOpen)) {
+                    showModal('featureClosedModal');
+                    return;
+                }
+                currentTestType = testType;
+                showModal('testLoginModal');
+            }
+
+            function handleTestLoginSubmit(e) {
+                e.preventDefault();
+                const username = document.getElementById('testUsername').value;
+                const password = document.getElementById('testPassword').value;
+                const user = registeredUsers.find(u => u.Username === username && u.Password.toString() === password);
+
+                if (user) {
+                    currentUser = user; // <-- IMPORTANT: Store the logged-in user
+                    hideModal('testLoginModal');
+                    const testTakerHeader = document.getElementById('testTakerHeader');
+                    const testTakerDetails = document.getElementById('testTakerDetails');
+                    const fullName = `${user.Prefix || ''} ${user.FirstName || ''} ${user.LastName || ''}`.trim();
+                    testTakerHeader.innerHTML = `ข้อมูลผู้ใช้งาน: <span class="text-primary">${user.Username}</span>`;
+                    testTakerDetails.innerHTML = `
+                        <ul>
+                            <li><span class="confirm-label">ชื่อ-สกุล</span><span class="confirm-value">: ${fullName}</span></li>
+                            <li><span class="confirm-label">สังกัด</span><span class="confirm-value">: ${user.Department}</span></li>
+                            <li><span class="confirm-label">ประเภทบุคลากร</span><span class="confirm-value">: ${user.PersonnelType}</span></li>
+                        </ul>`;
+                    switchPage('testTakerInfoPage');
+                } else {
+                    hideModal('testLoginModal');
+                    setTimeout(() => showModal('testWaitModal'), 400);
+                }
+            }
+
+            function handleStartTest() {
+                if (currentTestType === 'pre') {
+                    switchPage('preTestPage');
+                    preTestLogic.showScreen('start');
+                } else if (currentTestType === 'post') {
+                    switchPage('postTestPage');
+                    postTestLogic.showScreen('start');
+                }
+            }
+            
+            // --- CORE LOGIC (Registration, Admin, etc.) ---
+            function handleRegistrationSubmit(e) {
+                e.preventDefault();
+                const firstName = document.getElementById('firstName').value.trim();
+                const lastName = document.getElementById('lastName').value.trim();
+                const testUsername = document.getElementById('testUsernameInput').value.trim();
+
+                if (isDuplicateRegistration(firstName, lastName)) {
+                    showModal('duplicateModal');
+                    return;
+                }
+                if (registeredUsers.some(user => user.Username.toLowerCase() === testUsername.toLowerCase())) {
+                    alert('ชื่อผู้ใช้งานนี้มีผู้ใช้แล้ว กรุณาตั้งชื่ออื่น');
+                    return;
+                }
+                
+                const errors = validateForm();
+                if (errors.length > 0) {
+                    document.getElementById('errorList').innerHTML = `<p>โปรดแก้ไขรายการต่อไปนี้:</p><ul class="list-unstyled text-start ps-3">${errors.map(err => `<li><i class="bi bi-x-circle me-2"></i>${err}</li>`).join('')}</ul>`;
+                    showModal('errorModal');
+                } else {
+                    displayConfirmation();
+                }
+            }
+            
+            function isDuplicateRegistration(firstName, lastName) {
+                return registeredUsers.some(user => user.FirstName.toLowerCase() === firstName.toLowerCase() && user.LastName.toLowerCase() === lastName.toLowerCase());
+            }
+
+            function validateForm() {
+                const errors = [];
+                if ((document.getElementById('prefix').value === 'อื่น ๆ' && !document.getElementById('otherPrefix').value.trim()) || !document.getElementById('prefix').value) errors.push('กรุณาระบุ/เลือกคำนำหน้าชื่อ');
+                if (!document.getElementById('firstName').value.trim()) errors.push('กรุณากรอกชื่อ');
+                if (!document.getElementById('lastName').value.trim()) errors.push('กรุณากรอกนามสกุล');
+                if (!choicesInstance.getValue(true)) errors.push('กรุณาเลือกหน่วยงาน/สังกัด');
+                if (!document.getElementById('personnelType').value) errors.push('กรุณาเลือกประเภทบุคลากร');
+                if (!/^\d{10}$/.test(document.getElementById('phone').value)) errors.push('กรุณากรอกหมายเลขโทรศัพท์ 10 หลัก');
+                if (document.getElementById('testUsernameInput').value.trim().length < 4) errors.push('กรุณากรอกชื่อผู้ใช้งานอย่างน้อย 4 ตัวอักษร');
+                const foodInfo = document.querySelector('input[name="foodInfo"]:checked');
+                if (!foodInfo) errors.push('กรุณาเลือกข้อมูลการแพ้อาหาร');
+                else if (foodInfo.value === 'แพ้อาหาร' && !document.getElementById('allergyDetails').value.trim()) errors.push('กรุณาระบุอาหารที่แพ้');
+                return errors;
+            }
+
+            function displayConfirmation() {
+                let prefix = document.getElementById('prefix').value === 'อื่น ๆ' ? document.getElementById('otherPrefix').value : document.getElementById('prefix').value;
+                let fullName = `${document.getElementById('firstName').value} ${document.getElementById('lastName').value}`;
+                let foodInfoValue = document.querySelector('input[name="foodInfo"]:checked').value;
+                if (foodInfoValue === 'แพ้อาหาร') foodInfoValue += ` (${document.getElementById('allergyDetails').value})`;
+                const phone = document.getElementById('phone').value;
+                const password = phone.slice(-4);
+                const data = { 
+                    "👤 ชื่อ-สกุล": `${prefix} ${fullName}`, "🏢 หน่วยงาน": choicesInstance.getValue(true), "🧑‍💼 ประเภท": document.getElementById('personnelType').value, 
+                    "📞 โทรศัพท์": phone, "🍽️ อาหาร": foodInfoValue, "📝 Username": document.getElementById('testUsernameInput').value,
+                    "🔑 Password (4 ตัวท้ายของเบอร์โทรศัพท์)": password
+                };
+                document.getElementById('confirmationData').innerHTML = `<ul>${Object.entries(data).map(([k, v]) => `<li><span class="confirm-label">${k}</span><span class="confirm-value">: ${v || '-'}</span></li>`).join('')}</ul>`;
+                showModal('confirmationModal');
+            }
+
+            function handleFinalSubmit() {
+                hideModal('confirmationModal');
+                const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
+                const modalBody = document.getElementById('loadingModalBody');
+                modalBody.innerHTML = `<div class="text-white text-center"><div class="rocket-container"><div class="rocket-body">🚀</div><div class="rocket-trail"></div></div><p class="mt-3 fs-5">กำลังส่งข้อมูล...</p></div>`;
+                loadingModal.show();
+                const formData = new FormData();
+                formData.append('action', 'register');
+                formData.append('Timestamp', new Date().toISOString());
+                formData.append('Prefix', document.getElementById('prefix').value === 'อื่น ๆ' ? document.getElementById('otherPrefix').value : document.getElementById('prefix').value);
+                formData.append('FirstName', document.getElementById('firstName').value.trim());
+                formData.append('LastName', document.getElementById('lastName').value.trim());
+                formData.append('Department', choicesInstance.getValue(true));
+                formData.append('PersonnelType', document.getElementById('personnelType').value);
+                const phone = document.getElementById('phone').value;
+                formData.append('Phone', phone);
+                let foodInfoValue = document.querySelector('input[name="foodInfo"]:checked').value;
+                if (foodInfoValue === 'แพ้อาหาร') foodInfoValue += ` (${document.getElementById('allergyDetails').value})`;
+                formData.append('FoodInfo', foodInfoValue);
+                formData.append('Username', document.getElementById('testUsernameInput').value.trim());
+                formData.append('Password', phone.slice(-4));
+
+                fetch(SCRIPT_URL, { method: 'POST', body: formData})
+                    .then(response => response.json())
+                    .then(result => {
+                        if(result.status === 'success') {
+                            lastSuccessfulRegistration = Object.fromEntries(formData.entries());
+                            initializeDataFromSheet();
+                            modalBody.innerHTML = `<div class="success-popup-card"><div class="success-checkmark-icon"><i class="bi bi-check-lg"></i></div><h4 class="text-success">ลงทะเบียนสำเร็จ</h4><p class="text-muted">ข้อมูลของท่านถูกบันทึกเรียบร้อยแล้ว</p><button class="btn btn-success mt-3" id="finalOkBtn">ตกลง</button></div>`;
+                            document.getElementById('finalOkBtn').onclick = () => {
+                                loadingModal.hide();
+                                document.getElementById('generatedUsername').textContent = lastSuccessfulRegistration.Username;
+                                document.getElementById('generatedPassword').textContent = lastSuccessfulRegistration.Password;
+                                document.getElementById('loadingModal').addEventListener('hidden.bs.modal', () => { switchPage('successPage'); launchConfetti(); }, { once: true });
+                            };
+                        } else { throw new Error(result.message || 'Unknown error occurred'); }
+                    })
+                    .catch(error => {
+                        console.error('Error!', error.message);
+                        modalBody.innerHTML = `<div class="success-popup-card" style="background-color: #fef2f2; border-color: #fecaca;"><h4 class="text-danger">เกิดข้อผิดพลาด</h4><p class="text-muted">ไม่สามารถส่งข้อมูลได้ กรุณาลองใหม่อีกครั้ง</p><button class="btn btn-danger mt-3" data-bs-dismiss="modal">ปิด</button></div>`;
+                    });
+            }
+            
+            // --- ADMIN LOGIC ---
+            function handleAdminLogin(e) {
+                e.preventDefault();
+                if (document.getElementById('adminUsername').value === 'admin' && document.getElementById('adminPassword').value === 'admin6637') {
+                    hideModal('adminLoginModal');
+                    switchPage('adminDashboardPage');
+                    renderAdminDashboard();
+                } else { alert('Username หรือ Password ไม่ถูกต้อง'); }
+            }
+            function handleAdminLogout() { switchPage('introPage'); }
+
+            function renderAdminDashboard() {
+                renderSystemControls();
+                renderRegisteredUsers();
+            }
+
+            function renderSystemControls() {
+                const container = document.getElementById('systemControlsContainer');
+                container.innerHTML = `
+                    <div class="form-check form-switch form-check-reverse fs-5">
+                      <input class="form-check-input" type="checkbox" id="registrationToggleSwitch">
+                      <label class="form-check-label" for="registrationToggleSwitch">ระบบลงทะเบียน</label>
+                    </div>
+                    <div class="form-check form-switch form-check-reverse fs-5">
+                      <input class="form-check-input" type="checkbox" id="preTestToggleSwitch">
+                      <label class="form-check-label" for="preTestToggleSwitch">Pre-Test</label>
+                    </div>
+                    <div class="form-check form-switch form-check-reverse fs-5">
+                      <input class="form-check-input" type="checkbox" id="postTestToggleSwitch">
+                      <label class="form-check-label" for="postTestToggleSwitch">Post-Test</label>
+                    </div>
+                `;
+                
+                const regToggle = document.getElementById('registrationToggleSwitch');
+                const preToggle = document.getElementById('preTestToggleSwitch');
+                const postToggle = document.getElementById('postTestToggleSwitch');
+
+                regToggle.checked = appSettings.isRegistrationOpen;
+                preToggle.checked = appSettings.isPreTestOpen;
+                postToggle.checked = appSettings.isPostTestOpen;
+
+                [regToggle, preToggle, postToggle].forEach(toggle => {
+                    toggle.addEventListener('change', saveSystemSettings);
+                });
+            }
+            
+            async function saveSystemSettings() {
+                const newSettings = {
+                    isRegistrationOpen: document.getElementById('registrationToggleSwitch').checked,
+                    isPreTestOpen: document.getElementById('preTestToggleSwitch').checked,
+                    isPostTestOpen: document.getElementById('postTestToggleSwitch').checked,
+                };
+
+                const statusDiv = document.getElementById('settingsSaveStatus');
+                statusDiv.innerHTML = `<i class="bi bi-arrow-repeat"></i> กำลังบันทึก...`;
+                statusDiv.className = 'mt-3 small text-muted';
+
+                const formData = new FormData();
+                formData.append('action', 'updateSettings');
+                formData.append('settings', JSON.stringify(newSettings));
+
+                try {
+                    const response = await fetch(SCRIPT_URL, { method: 'POST', body: formData });
+                    const result = await response.json();
+                    if (result.status !== 'success') throw new Error(result.message || 'Unknown error');
+                    
+                    appSettings = newSettings;
+                    applyFeatureControls();
+                    statusDiv.innerHTML = `<i class="bi bi-check-circle-fill text-success"></i> บันทึกการตั้งค่าล่าสุดเมื่อ ${new Date().toLocaleTimeString()}`;
+                    statusDiv.className = 'mt-3 small text-success';
+
+                } catch (error) {
+                    console.error('Error saving settings:', error);
+                    statusDiv.innerHTML = `<i class="bi bi-exclamation-circle-fill text-danger"></i> เกิดข้อผิดพลาดในการบันทึก`;
+                    statusDiv.className = 'mt-3 small text-danger';
+                }
+            }
+
+            function renderRegisteredUsers() {
+                let usersHtml = `<h5><i class="bi bi-people-fill"></i> ข้อมูลผู้ลงทะเบียน (${registeredUsers.length} คน)</h5>`;
+                if (registeredUsers.length > 0) {
+                    usersHtml += `<button id="deleteSelectedBtn" class="btn btn-danger mb-3" style="display: none;"><i class="bi bi-trash-fill"></i> ลบรายการที่เลือก</button><div class="table-responsive"><table class="table table-striped table-hover"><thead><tr><th><input type="checkbox" id="selectAllCheckbox"></th><th>#</th><th>ชื่อ-สกุล</th><th>Username</th><th>Password</th><th>หน่วยงาน</th><th>ประเภทบุคลากร</th><th>โทรศัพท์</th><th>ข้อมูลอาหาร</th><th>จัดการ</th></tr></thead><tbody>`;
+                    registeredUsers.forEach((user, index) => {
+                        const fullName = `${user.Prefix || ''} ${user.FirstName || ''} ${user.LastName || ''}`.trim();
+                        usersHtml += `<tr><td><input type="checkbox" class="user-checkbox" data-id="${user.Timestamp}"></td><td>${index + 1}</td><td>${fullName}</td><td>${user.Username}</td><td>${user.Password}</td><td>${user.Department}</td><td>${user.PersonnelType}</td><td>${user.Phone}</td><td>${user.FoodInfo}</td><td><button class="btn btn-sm btn-danger delete-user-btn" data-id="${user.Timestamp}"><i class="bi bi-trash-fill"></i></button></td></tr>`;
+                    });
+                    usersHtml += `</tbody></table></div>`;
+                } else {
+                    usersHtml += `<div class="alert alert-secondary mt-3">ยังไม่มีผู้ลงทะเบียน</div>`;
+                }
+                document.getElementById('registeredUsersSection').innerHTML = usersHtml;
+                
+                document.getElementById('selectAllCheckbox')?.addEventListener('change', (e) => {
+                    document.querySelectorAll('.user-checkbox').forEach(cb => cb.checked = e.target.checked);
+                    toggleDeleteSelectedButton();
+                });
+                document.querySelectorAll('.user-checkbox').forEach(cb => cb.addEventListener('change', toggleDeleteSelectedButton));
+            }
+            
+            function toggleDeleteSelectedButton() {
+                const checkedCount = document.querySelectorAll('.user-checkbox:checked').length;
+                const btn = document.getElementById('deleteSelectedBtn');
+                if (btn) btn.style.display = checkedCount > 0 ? 'inline-block' : 'none';
+            }
+
+            async function refreshAdminData(e) {
+                const btn = e.currentTarget;
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> กำลังรีเฟรช...';
+                await initializeDataFromSheet();
+                renderAdminDashboard();
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-arrow-clockwise"></i> รีเฟรชข้อมูล';
+            }
+
+            function requestPasswordConfirmation(action) {
+                actionToConfirm = action;
+                document.getElementById('confirmAdminPassword').value = '';
+                document.getElementById('passwordConfirmError').classList.add('d-none');
+                showModal('passwordConfirmModal');
+            }
+
+            function handlePasswordConfirmation() {
+                if (document.getElementById('confirmAdminPassword').value === 'admin6637') {
+                    executeConfirmedAction();
+                    hideModal('passwordConfirmModal');
+                } else {
+                    document.getElementById('passwordConfirmError').classList.remove('d-none');
+                }
+            }
+
+            async function executeConfirmedAction() {
+                if (!actionToConfirm) return;
+                const formData = new FormData();
+                if (actionToConfirm.type === 'deleteUser') {
+                    formData.append('action', 'deleteUser');
+                    formData.append('userId', actionToConfirm.payload);
+                } else if(actionToConfirm.type === 'deleteMultipleUsers') {
+                    formData.append('action', 'deleteMultipleUsers');
+                    formData.append('userIds', JSON.stringify(actionToConfirm.payload));
+                }
+
+                try {
+                    const res = await fetch(SCRIPT_URL, { method: 'POST', body: formData });
+                    const result = await res.json();
+                    if(result.status === 'success') {
+                        alert('ดำเนินการเรียบร้อยแล้ว');
+                        await initializeDataFromSheet();
+                        renderAdminDashboard(); // FIXED: Refresh the whole dashboard
+                    } else { throw new Error(result.message || 'Unknown error'); }
+                } catch (error) {
+                    alert('เกิดข้อผิดพลาด: ' + error.message);
+                } finally {
+                    actionToConfirm = null;
+                }
+            }
+            
+            // --- HELPER FUNCTIONS (Calendar, Confetti, Recovery) ---
+            function generateAndDownloadICS() {
+                if (!lastSuccessfulRegistration) return;
+                const { Username, Password } = lastSuccessfulRegistration;
+                const description = `การนัดหมายเข้าร่วมโครงการส่งเสริมการพัฒนาคุณภาพชีวิตฯ\\n\\nข้อมูลสำหรับทำแบบทดสอบ:\\nUsername: ${Username}\\nPassword: ${Password}`;
+                const cal = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Your Company//Your App//EN','BEGIN:VEVENT',
+                    'UID:' + Date.now() + '@yourdomain.com','DTSTAMP:' + new Date().toISOString().replace(/[-:.]/g, '') + 'Z',
+                    'DTSTART:20250724T013000Z', 'DTEND:20250724T090000Z', 'RRULE:FREQ=DAILY;COUNT=2',
+                    'SUMMARY:โครงการส่งเสริมการพัฒนาคุณภาพชีวิต สุขภาพดี ตามวิถีธรรมชาติ',
+                    'LOCATION:ห้องประชุม ชั้น 8 อาคาร 72 ปี กรมธนารักษ์', 'DESCRIPTION:' + description,
+                    'END:VEVENT','END:VCALENDAR'
+                ].join('\n');
+                const blob = new Blob([cal], { type: 'text/calendar;charset=utf-8' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = 'event-bio-organic.ics';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+
+            function launchConfetti() {
+                const canvas = document.getElementById('confetti-canvas');
+                if (!canvas) return;
+                const myConfetti = confetti.create(canvas, { resize: true, useWorker: true });
+                const duration = 3 * 1000, animationEnd = Date.now() + duration, defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+                function randomInRange(min, max) { return Math.random() * (max - min) + min; }
+                const interval = setInterval(function() {
+                    const timeLeft = animationEnd - Date.now();
+                    if (timeLeft <= 0) { return clearInterval(interval); }
+                    const particleCount = 50 * (timeLeft / duration);
+                    myConfetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+                    myConfetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+                }, 250);
+            }
+
+            function handleForgotPasswordLinkClick(e) {
+                e.preventDefault();
+                hideModal('testLoginModal');
+                setTimeout(() => {
+                    showModal('forgotPasswordModal');
+                    document.getElementById('recoveryResult').innerHTML = '';
+                }, 400);
+            }
+
+            function handleForgotPasswordSubmit(e) {
+                e.preventDefault();
+                const firstName = document.getElementById('recoveryFirstName').value.trim();
+                const lastName = document.getElementById('recoveryLastName').value.trim();
+                const phone = document.getElementById('recoveryPhone').value.trim();
+                const recoveryResultDiv = document.getElementById('recoveryResult');
+                const user = registeredUsers.find(u => u.FirstName.toLowerCase() === firstName.toLowerCase() && u.LastName.toLowerCase() === lastName.toLowerCase() && u.Phone.toString() === phone);
+                if (user) {
+                    recoveryResultDiv.innerHTML = `<div class="alert alert-success"><h5>พบข้อมูลของคุณแล้ว!</h5><p class="mb-1"><strong>Username:</strong> ${user.Username}</p><p class="mb-0"><strong>Password:</strong> ${user.Password}</p></div>`;
+                } else {
+                    recoveryResultDiv.innerHTML = `<div class="alert alert-danger">ไม่พบข้อมูลที่ตรงกัน กรุณาตรวจสอบอีกครั้ง</div>`;
+                }
+            }
+
+            // --- PRE-TEST LOGIC OBJECT ---
+            const preTestLogic = {
+                questions: [
+                    { question: "การออกกำลังกายอย่างสม่ำเสมอมีประโยชน์ต่อสุขภาพจิตอย่างไร?", options: [{ text: "ช่วยลดความเครียดและอาการซึมเศร้า", correct: true }, { text: "ทำให้มีเพื่อนมากขึ้น", correct: false }, { text: "เพิ่มความอยากอาหาร", correct: false }, { text: "ทำให้นอนหลับน้อยลง", correct: false }] },
+                    { question: "อาหารประเภทใดที่ควรบริโภคเพื่อสุขภาพที่ดี?", options: [{ text: "ผักและผลไม้", correct: true }, { text: "อาหารจานด่วน (Fast Food)", correct: false }, { text: "เครื่องดื่มแอลกอฮอล์", correct: false }, { text: "ขนมหวานและน้ำอัดลม", correct: false }] },
+                    { question: "การนอนหลับพักผ่อนที่เพียงพอสำหรับผู้ใหญ่คือประมาณกี่ชั่วโมงต่อคืน?", options: [{ text: "7-9 ชั่วโมง", correct: true }, { text: "4-6 ชั่วโมง", correct: false }, { text: "มากกว่า 10 ชั่วโมง", correct: false }, { text: "น้อยกว่า 4 ชั่วโมง", correct: false }] },
+                    { question: "ข้อใดคือวิธีการจัดการความเครียดที่มีประสิทธิภาพ?", options: [{ text: "การทำสมาธิหรือฝึกโยคะ", correct: true }, { text: "การเก็บความรู้สึกไว้คนเดียว", correct: false }, { text: "การทำงานหามรุ่งหามค่ำ", correct: false }, { text: "การดื่มเครื่องดื่มมึนเมา", correct: false }] },
+                    { question: "การดื่มน้ำสะอาดให้เพียงพอต่อวันมีประโยชน์อย่างไร?", options: [{ text: "ช่วยให้ระบบต่างๆ ในร่างกายทำงานได้ดี", correct: true }, { text: "ทำให้น้ำหนักตัวเพิ่มขึ้น", correct: false }, { text: "ทำให้รู้สึกเหนื่อยง่าย", correct: false }, { text: "ไม่จำเป็นต่อร่างกาย", correct: false }] },
+                    { question: "กิจกรรมใดที่ช่วยส่งเสริมความสัมพันธ์ที่ดีกับผู้อื่น?", options: [{ text: "การพูดคุยและรับฟังอย่างตั้งใจ", correct: true }, { text: "การใช้เวลาอยู่กับโซเชียลมีเดียตลอดเวลา", correct: false }, { text: "การวิพากษ์วิจารณ์ผู้อื่น", correct: false }, { text: "การหลีกเลี่ยงการพบปะผู้คน", correct: false }] },
+                    { question: "การตรวจสุขภาพประจำปีมีความสำคัญอย่างไร?", options: [{ text: "ช่วยค้นหาความเสี่ยงของโรคตั้งแต่เนิ่นๆ", correct: true }, { text: "เป็นการสิ้นเปลืองเงินโดยใช่เหตุ", correct: false }, { text: "ทำให้เกิดความเครียดจากการรอผล", correct: false }, { text: "จำเป็นสำหรับผู้สูงอายุเท่านั้น", correct: false }] },
+                    { question: "ทัศนคติเชิงบวก (Positive Thinking) ส่งผลดีอย่างไร?", options: [{ text: "ช่วยให้รับมือกับปัญหาได้ดีขึ้น", correct: true }, { text: "ทำให้มองไม่เห็นปัญหาที่แท้จริง", correct: false }, { text: "ไม่ส่งผลอะไรต่อสุขภาพจิต", correct: false }, { text: "ทำให้เป็นคนไม่รอบคอบ", correct: false }] },
+                    { question: "ข้อใดไม่ใช่องค์ประกอบของการมีสุขภาพกายที่ดี?", options: [{ text: "การสูบบุหรี่เป็นประจำ", correct: true }, { text: "การรับประทานอาหารครบ 5 หมู่", correct: false }, { text: "การมีน้ำหนักตัวตามเกณฑ์", correct: false }, { text: "การออกกำลังกาย", correct: false }] },
+                    { question: "เมื่อรู้สึกท้อแท้หรือหมดกำลังใจ ควรทำอย่างไรเป็นอันดับแรก?", options: [{ text: "พูดคุยกับเพื่อนหรือคนที่ไว้ใจ", correct: true }, { text: "ยอมแพ้และล้มเลิกความตั้งใจ", correct: false }, { text: "ตำหนิตัวเอง", correct: false }, { text: "แยกตัวออกจากสังคม", correct: false }] }
+                ],
+                elements: {}, state: { currentQuestionIndex: 0, score: 0, selectedOption: null },
+                init() {
+                    this.elements = {
+                        screens: { start: document.getElementById('pre-start-screen'), quiz: document.getElementById('pre-quiz-screen'), processing: document.getElementById('pre-processing-screen'), result: document.getElementById('pre-result-screen') },
+                        startBtn: document.getElementById('pre-start-btn'), nextBtn: document.getElementById('pre-next-btn'), finishBtn: document.getElementById('pre-finish-btn'),
+                        questionText: document.getElementById('pre-question-text'), optionsContainer: document.getElementById('pre-options-container'), alertMessage: document.getElementById('pre-alert-message'),
+                        currentQNumber: document.getElementById('pre-current-q-number'), progressBar: document.getElementById('pre-progress-bar'), progressPercent: document.getElementById('pre-progress-percent'),
+                        scoreText: document.getElementById('pre-score-text'), resultTitle: document.getElementById('pre-result-title'), resultMessage: document.getElementById('pre-result-message'),
+                        confettiCanvas: document.getElementById('pre-confetti-canvas'),
+                        processingText: document.getElementById('pre-processing-text'),
+                    };
+                    this.elements.startBtn.addEventListener('click', () => this.startQuiz());
+                    this.elements.nextBtn.addEventListener('click', () => this.handleNextQuestion());
+                    this.elements.finishBtn.addEventListener('click', () => switchPage('introPage'));
+                    this.showScreen('start');
+                },
+                showScreen(screenId) { Object.values(this.elements.screens).forEach(s => s.classList.remove('active')); this.elements.screens[screenId].classList.add('active'); },
+                shuffleArray(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } },
+                startQuiz() { this.showScreen('quiz'); this.state.currentQuestionIndex = 0; this.state.score = 0; this.showQuestion(); },
+                showQuestion() {
+                    this.resetState();
+                    const currentQuestion = this.questions[this.state.currentQuestionIndex], questionNumber = this.state.currentQuestionIndex + 1, progress = (questionNumber / this.questions.length) * 100;
+                    this.elements.currentQNumber.innerText = questionNumber; this.elements.progressBar.style.width = `${progress}%`; this.elements.progressPercent.innerText = Math.round(progress);
+                    this.elements.questionText.innerText = currentQuestion.question;
+                    let shuffledOptions = [...currentQuestion.options]; this.shuffleArray(shuffledOptions);
+                    shuffledOptions.forEach(option => {
+                        const button = document.createElement('button');
+                        button.className = 'quiz-option w-full p-4 border-2 border-slate-300 rounded-xl text-left text-lg hover:bg-emerald-50';
+                        button.dataset.correct = option.correct;
+                        button.innerHTML = `<span class="option-text">${option.text}</span><span class="checkmark">✔</span>`;
+                        button.addEventListener('click', () => this.selectOption(button));
+                        this.elements.optionsContainer.appendChild(button);
+                    });
+                    this.elements.nextBtn.innerText = (this.state.currentQuestionIndex === this.questions.length - 1) ? 'ส่งคำตอบ' : 'ข้อถัดไป';
+                },
+                resetState() { this.state.selectedOption = null; this.elements.alertMessage.style.display = 'none'; while (this.elements.optionsContainer.firstChild) { this.elements.optionsContainer.removeChild(this.elements.optionsContainer.firstChild); } },
+                selectOption(button) { Array.from(this.elements.optionsContainer.children).forEach(btn => btn.classList.remove('selected')); button.classList.add('selected'); this.state.selectedOption = button; this.elements.alertMessage.style.display = 'none'; },
+                handleNextQuestion() {
+                    if (this.state.selectedOption === null) { this.elements.alertMessage.style.display = 'block'; return; }
+                    if (this.state.selectedOption.dataset.correct === 'true') this.state.score++;
+                    this.state.currentQuestionIndex++;
+                    if (this.state.currentQuestionIndex < this.questions.length) {
+                        this.showQuestion();
+                    } else {
+                        this.elements.processingText.innerHTML = 'กำลังบันทึกคะแนน...';
+                        this.showScreen('processing');
+                        this.savePreTestScore();
+                    }
+                },
+                async savePreTestScore() {
+                    if (!currentUser) {
+                        console.error("No user logged in. Cannot save score.");
+                        alert("เกิดข้อผิดพลาด: ไม่พบข้อมูลผู้ใช้");
+                        this.showResults(); // Show results anyway but without saving
+                        return;
+                    }
+                    const formData = new FormData();
+                    formData.append('action', 'savePreTestScore');
+                    formData.append('userId', currentUser.Timestamp);
+                    formData.append('username', currentUser.Username);
+                    formData.append('fullName', `${currentUser.Prefix} ${currentUser.FirstName} ${currentUser.LastName}`);
+                    formData.append('score', this.state.score);
+
+                    try {
+                        const response = await fetch(SCRIPT_URL, { method: 'POST', body: formData });
+                        const result = await response.json();
+                        if (result.status !== 'success') throw new Error(result.message);
+                        console.log("Pre-test score saved successfully.");
+                    } catch (error) {
+                        console.error("Error saving pre-test score:", error);
+                        alert("เกิดข้อผิดพลาดในการบันทึกคะแนน");
+                    } finally {
+                        this.showResults();
+                    }
+                },
+                showResults() {
+                    this.showScreen('result'); this.elements.scoreText.innerText = this.state.score;
+                    this.elements.resultTitle.classList.remove('text-green-500', 'text-blue-500', 'text-amber-500');
+                    if (this.state.score >= 7) {
+                        this.elements.resultTitle.innerText = 'ยินดีด้วย!'; this.elements.resultTitle.classList.add('text-green-500');
+                        this.elements.resultMessage.innerText = 'คุณมีความรู้ความเข้าใจในเรื่องการดูแลสุขภาพเป็นอย่างดีเยี่ยมเลย'; this.triggerConfetti();
+                    } else if (this.state.score >= 4) {
+                        this.elements.resultTitle.innerText = 'ทำได้ดี!'; this.elements.resultTitle.classList.add('text-blue-500');
+                        this.elements.resultMessage.innerText = 'คะแนนของคุณอยู่ในเกณฑ์ที่ดี ลองทบทวนอีกนิดเพื่อความสมบูรณ์แบบนะ';
+                    } else {
+                        this.elements.resultTitle.innerText = 'ไม่เป็นไรนะ'; this.elements.resultTitle.classList.add('text-amber-500');
+                        this.elements.resultMessage.innerText = 'การเรียนรู้ไม่มีที่สิ้นสุด ลองพยายามอีกครั้งในแบบทดสอบหลังเรียนนะ!';
+                    }
+                },
+                triggerConfetti() { const myConfetti = confetti.create(this.elements.confettiCanvas, { resize: true, useWorker: true }); myConfetti({ particleCount: 150, spread: 180, origin: { y: 0.6 } }); }
+            };
+
+            // --- POST-TEST LOGIC OBJECT ---
+            const postTestLogic = {
+                questions: [ /* Same questions as pre-test */
+                    { question: "การออกกำลังกายอย่างสม่ำเสมอมีประโยชน์ต่อสุขภาพจิตอย่างไร?", options: [{ text: "ช่วยลดความเครียดและอาการซึมเศร้า", correct: true }, { text: "ทำให้มีเพื่อนมากขึ้น", correct: false }, { text: "เพิ่มความอยากอาหาร", correct: false }, { text: "ทำให้นอนหลับน้อยลง", correct: false }] },
+                    { question: "อาหารประเภทใดที่ควรบริโภคเพื่อสุขภาพที่ดี?", options: [{ text: "ผักและผลไม้", correct: true }, { text: "อาหารจานด่วน (Fast Food)", correct: false }, { text: "เครื่องดื่มแอลกอฮอล์", correct: false }, { text: "ขนมหวานและน้ำอัดลม", correct: false }] },
+                    { question: "การนอนหลับพักผ่อนที่เพียงพอสำหรับผู้ใหญ่คือประมาณกี่ชั่วโมงต่อคืน?", options: [{ text: "7-9 ชั่วโมง", correct: true }, { text: "4-6 ชั่วโมง", correct: false }, { text: "มากกว่า 10 ชั่วโมง", correct: false }, { text: "น้อยกว่า 4 ชั่วโมง", correct: false }] },
+                    { question: "ข้อใดคือวิธีการจัดการความเครียดที่มีประสิทธิภาพ?", options: [{ text: "การทำสมาธิหรือฝึกโยคะ", correct: true }, { text: "การเก็บความรู้สึกไว้คนเดียว", correct: false }, { text: "การทำงานหามรุ่งหามค่ำ", correct: false }, { text: "การดื่มเครื่องดื่มมึนเมา", correct: false }] },
+                    { question: "การดื่มน้ำสะอาดให้เพียงพอต่อวันมีประโยชน์อย่างไร?", options: [{ text: "ช่วยให้ระบบต่างๆ ในร่างกายทำงานได้ดี", correct: true }, { text: "ทำให้น้ำหนักตัวเพิ่มขึ้น", correct: false }, { text: "ทำให้รู้สึกเหนื่อยง่าย", correct: false }, { text: "ไม่จำเป็นต่อร่างกาย", correct: false }] },
+                    { question: "กิจกรรมใดที่ช่วยส่งเสริมความสัมพันธ์ที่ดีกับผู้อื่น?", options: [{ text: "การพูดคุยและรับฟังอย่างตั้งใจ", correct: true }, { text: "การใช้เวลาอยู่กับโซเชียลมีเดียตลอดเวลา", correct: false }, { text: "การวิพากษ์วิจารณ์ผู้อื่น", correct: false }, { text: "การหลีกเลี่ยงการพบปะผู้คน", correct: false }] },
+                    { question: "การตรวจสุขภาพประจำปีมีความสำคัญอย่างไร?", options: [{ text: "ช่วยค้นหาความเสี่ยงของโรคตั้งแต่เนิ่นๆ", correct: true }, { text: "เป็นการสิ้นเปลืองเงินโดยใช่เหตุ", correct: false }, { text: "ทำให้เกิดความเครียดจากการรอผล", correct: false }, { text: "จำเป็นสำหรับผู้สูงอายุเท่านั้น", correct: false }] },
+                    { question: "ทัศนคติเชิงบวก (Positive Thinking) ส่งผลดีอย่างไร?", options: [{ text: "ช่วยให้รับมือกับปัญหาได้ดีขึ้น", correct: true }, { text: "ทำให้มองไม่เห็นปัญหาที่แท้จริง", correct: false }, { text: "ไม่ส่งผลอะไรต่อสุขภาพจิต", correct: false }, { text: "ทำให้เป็นคนไม่รอบคอบ", correct: false }] },
+                    { question: "ข้อใดไม่ใช่องค์ประกอบของการมีสุขภาพกายที่ดี?", options: [{ text: "การสูบบุหรี่เป็นประจำ", correct: true }, { text: "การรับประทานอาหารครบ 5 หมู่", correct: false }, { text: "การมีน้ำหนักตัวตามเกณฑ์", correct: false }, { text: "การออกกำลังกาย", correct: false }] },
+                    { question: "เมื่อรู้สึกท้อแท้หรือหมดกำลังใจ ควรทำอย่างไรเป็นอันดับแรก?", options: [{ text: "พูดคุยกับเพื่อนหรือคนที่ไว้ใจ", correct: true }, { text: "ยอมแพ้และล้มเลิกความตั้งใจ", correct: false }, { text: "ตำหนิตัวเอง", correct: false }, { text: "แยกตัวออกจากสังคม", correct: false }] }
+                ],
+                evaluationQuestions: ["ความรู้ที่ได้รับจากโครงการมีประโยชน์เพียงใด", "ความเหมาะสมของเนื้อหาการอบรม", "ความสามารถในการถ่ายทอดของวิทยากร", "ความเหมาะสมของระยะเวลาในการจัดโครงการ", "ความสะดวกของสถานที่หรือช่องทางการอบรม", "เอกสารประกอบการอบรมมีความชัดเจนและน่าสนใจ", "การจัดกิจกรรมส่งเสริมการเรียนรู้", "การดูแลและการให้บริการของเจ้าหน้าที่", "ท่านจะนำความรู้ที่ได้ไปปรับใช้ในชีวิตประจำวัน", "ความพึงพอใจโดยรวมต่อโครงการนี้"],
+                elements: {}, state: { currentQuestionIndex: 0, score: 0, selectedOption: null },
+                init() {
+                    this.elements = {
+                        screens: { start: document.getElementById('post-start-screen'), quiz: document.getElementById('post-quiz-screen'), processing: document.getElementById('post-processing-screen'), result: document.getElementById('post-result-screen'), evalStart: document.getElementById('post-evaluation-start-screen'), evaluation: document.getElementById('post-evaluation-screen'), final: document.getElementById('post-final-screen') },
+                        startBtn: document.getElementById('post-start-btn'), nextBtn: document.getElementById('post-next-btn'), evaluationStartBtn: document.getElementById('post-evaluation-start-btn'), startEvaluationBtn: document.getElementById('post-start-evaluation-btn'), submitEvaluationBtn: document.getElementById('post-submit-evaluation-btn'), finishBtn: document.getElementById('post-finish-btn'),
+                        questionText: document.getElementById('post-question-text'), optionsContainer: document.getElementById('post-options-container'), alertMessage: document.getElementById('post-alert-message'), evaluationAlert: document.getElementById('evaluation-alert-message'), evaluationQuestionsContainer: document.getElementById('post-evaluation-questions-container'),
+                        currentQNumber: document.getElementById('post-current-q-number'), progressBar: document.getElementById('post-progress-bar'), progressPercent: document.getElementById('post-progress-percent'),
+                        scoreText: document.getElementById('post-score-text'), resultTitle: document.getElementById('post-result-title'), resultMessage: document.getElementById('post-result-message'),
+                        confettiCanvas: document.getElementById('post-confetti-canvas'), finalConfettiCanvas: document.getElementById('post-final-confetti-canvas'),
+                        processingText: document.getElementById('post-processing-text'),
+                    };
+                    this.elements.startBtn.addEventListener('click', () => this.startQuiz());
+                    this.elements.nextBtn.addEventListener('click', () => this.handleNextQuestion());
+                    this.elements.evaluationStartBtn.addEventListener('click', () => this.showScreen('evalStart'));
+                    this.elements.startEvaluationBtn.addEventListener('click', () => this.startEvaluation());
+                    this.elements.submitEvaluationBtn.addEventListener('click', () => this.submitEvaluation());
+                    this.elements.finishBtn.addEventListener('click', () => switchPage('introPage'));
+                    this.showScreen('start');
+                },
+                showScreen(screenId) { Object.values(this.elements.screens).forEach(s => s.classList.remove('active')); this.elements.screens[screenId].classList.add('active'); },
+                shuffleArray(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } },
+                startQuiz() { this.showScreen('quiz'); this.state.currentQuestionIndex = 0; this.state.score = 0; this.showQuestion(); },
+                showQuestion() {
+                    this.resetState();
+                    const currentQuestion = this.questions[this.state.currentQuestionIndex], questionNumber = this.state.currentQuestionIndex + 1, progress = (questionNumber / this.questions.length) * 100;
+                    this.elements.currentQNumber.innerText = questionNumber; this.elements.progressBar.style.width = `${progress}%`; this.elements.progressPercent.innerText = Math.round(progress);
+                    this.elements.questionText.innerText = currentQuestion.question;
+                    let shuffledOptions = [...currentQuestion.options]; this.shuffleArray(shuffledOptions);
+                    shuffledOptions.forEach(option => {
+                        const button = document.createElement('button');
+                        button.className = 'quiz-option w-full p-4 border-2 border-slate-300 rounded-xl text-left text-lg hover:bg-blue-50';
+                        button.dataset.correct = option.correct;
+                        button.innerHTML = `<span class="option-text">${option.text}</span><span class="checkmark">✔</span>`;
+                        button.addEventListener('click', () => this.selectOption(button));
+                        this.elements.optionsContainer.appendChild(button);
+                    });
+                    this.elements.nextBtn.innerText = (this.state.currentQuestionIndex === this.questions.length - 1) ? 'ส่งคำตอบ' : 'ข้อถัดไป';
+                },
+                resetState() { this.state.selectedOption = null; this.elements.alertMessage.style.display = 'none'; while (this.elements.optionsContainer.firstChild) { this.elements.optionsContainer.removeChild(this.elements.optionsContainer.firstChild); } },
+                selectOption(button) { Array.from(this.elements.optionsContainer.children).forEach(btn => btn.classList.remove('selected')); button.classList.add('selected'); this.state.selectedOption = button; this.elements.alertMessage.style.display = 'none'; },
+                handleNextQuestion() {
+                    if (this.state.selectedOption === null) { this.elements.alertMessage.style.display = 'block'; return; }
+                    if (this.state.selectedOption.dataset.correct === 'true') this.state.score++;
+                    this.state.currentQuestionIndex++;
+                    if (this.state.currentQuestionIndex < this.questions.length) this.showQuestion(); else { this.showScreen('processing'); setTimeout(() => this.showResults(), 2000); }
+                },
+                showResults() {
+                    this.showScreen('result'); this.elements.scoreText.innerText = this.state.score;
+                    this.elements.resultTitle.classList.remove('text-green-500', 'text-blue-500', 'text-amber-500');
+                    if (this.state.score >= 7) {
+                        this.elements.resultTitle.innerText = 'ยอดเยี่ยมมาก!'; this.elements.resultTitle.classList.add('text-green-500');
+                        this.elements.resultMessage.innerText = 'คุณมีความเข้าใจเนื้อหาทั้งหมดเป็นอย่างดี ขอแสดงความยินดีด้วยครับ'; this.triggerConfetti(this.elements.confettiCanvas);
+                    } else if (this.state.score >= 4) {
+                        this.elements.resultTitle.innerText = 'ทำได้ดี!'; this.elements.resultTitle.classList.add('text-blue-500');
+                        this.elements.resultMessage.innerText = 'คุณมีความเข้าใจในระดับที่ดีแล้ว ก้าวต่อไปข้างหน้าได้เลย!';
+                    } else {
+                        this.elements.resultTitle.innerText = 'สู้ๆ นะ'; this.elements.resultTitle.classList.add('text-amber-500');
+                        this.elements.resultMessage.innerText = 'ไม่เป็นไรเลย การเรียนรู้คือการเดินทาง ขอเป็นกำลังใจให้ครับ';
+                    }
+                },
+                triggerConfetti(canvas, options = {}) { const myConfetti = confetti.create(canvas, { resize: true, useWorker: true }); myConfetti({ particleCount: 150, spread: 180, origin: { y: 0.6 }, ...options }); },
+                startEvaluation() { this.showScreen('evaluation'); this.populateEvaluationQuestions(); },
+                populateEvaluationQuestions() {
+                    this.elements.evaluationQuestionsContainer.innerHTML = '';
+                    const starSVG = `<svg class="star-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>`;
+                    this.evaluationQuestions.forEach((q, index) => {
+                        const qDiv = document.createElement('div');
+                        qDiv.className = 'p-4 bg-slate-100 rounded-lg';
+                        qDiv.innerHTML = `<p class="font-medium mb-3 text-slate-700">${index + 1}. ${q}</p><div class="star-rating flex justify-center items-center" data-question-index="${index}">${[1,2,3,4,5].map(i => `<div class="star" data-value="${i}">${starSVG}<span class="star-number">${i}</span></div>`).join('')}</div>`;
+                        this.elements.evaluationQuestionsContainer.appendChild(qDiv);
+                    });
+                    document.querySelectorAll('#postTestPage .star-rating .star').forEach(star => { star.addEventListener('click', (e) => this.handleStarClick(e)); star.addEventListener('mouseover', (e) => this.handleStarHover(e)); star.addEventListener('mouseout', (e) => this.handleStarMouseOut(e)); });
+                },
+                handleStarClick(e) { const star = e.currentTarget, rating = star.dataset.value, parent = star.parentElement; parent.dataset.rating = rating; Array.from(parent.children).forEach(s => s.classList.toggle('selected', s.dataset.value <= rating)); },
+                handleStarHover(e) { const star = e.currentTarget, rating = star.dataset.value, parent = star.parentElement; Array.from(parent.children).forEach(s => s.classList.toggle('hover', s.dataset.value <= rating)); },
+                handleStarMouseOut(e) { Array.from(e.currentTarget.parentElement.children).forEach(s => s.classList.remove('hover')); },
+                async submitEvaluation() {
+                    const ratings = Array.from(this.elements.evaluationQuestionsContainer.querySelectorAll('.star-rating')).map(r => r.dataset.rating || 0);
+                    if (ratings.includes(0)) {
+                        this.elements.evaluationAlert.style.display = 'block';
+                        return;
+                    }
+                    this.elements.evaluationAlert.style.display = 'none';
+                    this.elements.processingText.innerHTML = 'กำลังบันทึกข้อมูล...';
+                    this.showScreen('processing');
+
+                    if (!currentUser) {
+                        console.error("No user logged in. Cannot save results.");
+                        alert("เกิดข้อผิดพลาด: ไม่พบข้อมูลผู้ใช้");
+                        this.showScreen('final');
+                        return;
+                    }
+
+                    const formData = new FormData();
+                    formData.append('action', 'savePostTestResults');
+                    formData.append('userId', currentUser.Timestamp);
+                    formData.append('username', currentUser.Username);
+                    formData.append('fullName', `${currentUser.Prefix} ${currentUser.FirstName} ${currentUser.LastName}`);
+                    formData.append('score', this.state.score);
+                    formData.append('evaluationData', JSON.stringify(ratings));
+
+                    try {
+                        const response = await fetch(SCRIPT_URL, { method: 'POST', body: formData });
+                        const result = await response.json();
+                        if (result.status !== 'success') throw new Error(result.message);
+                        console.log("Post-test results saved successfully.");
+                    } catch (error) {
+                        console.error("Error saving post-test results:", error);
+                        alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล");
+                    } finally {
+                        this.showScreen('final'); 
+                        this.triggerConfetti(this.elements.finalConfettiCanvas, { particleCount: 250, spread: 360, startVelocity: 40, scalar: 1.2 });
+                    }
+                }
+            };
+            
+            // --- START THE APP ---
+            initialize();
+        });
+    </script>
+</body>
+</html>
